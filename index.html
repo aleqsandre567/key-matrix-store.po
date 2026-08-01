@@ -580,7 +580,7 @@
 
     <!-- GLOBAL PUBLIC MESSAGING & REVIEWS -->
     <div class="section-box">
-      <h2>💬 Public Community Reviews & Chat</h2>
+      <h2>💬 Public Community Reviews</h2>
       <p style="color: var(--text-gray); margin-top: 5px; font-size: 14px;">Leave a public review or feedback visible to everyone in real-time!</p>
       
       <div style="margin: 15px 0;">
@@ -603,7 +603,7 @@
 
       <h3 style="margin-top: 35px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Live Community Messages</h3>
       <div class="review-chat-box" id="reviews-container">
-        <p style="color: var(--text-gray);">Connecting to live community database...</p>
+        <p style="color: var(--text-gray);">Loading customer reviews...</p>
       </div>
     </div>
   </div>
@@ -725,7 +725,6 @@
   <!-- MAIN SCRIPT -->
   <script>
     // 1. FIREBASE REALTIME DATABASE CONFIGURATION
-    // (Free cloud database endpoint that allows all online users to share messages in real-time)
     const firebaseConfig = {
       databaseURL: "https://keymatrix-store-default-rtdb.firebaseio.com"
     };
@@ -736,6 +735,13 @@
     }
     const db = firebase.database();
 
+    // FIXED REVIEWS (Default static reviews)
+    const fixedReviews = [
+      { name: "Saba G.", rating: 5, message: "ძალიან სწრაფი მიწოდება იყო! კლავიატურა იდეალურ მდგომარეობაში ჩამოვიდა." },
+      { name: "Nika_Gamer", rating: 5, message: "Matrix Viper mouse is insane for CS2. Best store in Georgia!" },
+      { name: "Luka", rating: 4, message: "კარგი ხარისხის მაუსპადი, ძალიან რბილია და ხელი არ მეღლება." }
+    ];
+
     // 2. STORE GLOBAL STATE
     let products = typeof defaultProducts !== 'undefined' ? defaultProducts : [
       { id: 1, name: "KeyMatrix Pro 60%", category: "keyboard", price: 79.99, oldPrice: 99.99, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=60%25+Keyboard", desc: "Mechanical gaming keyboard with hot-swappable switches and RGB." },
@@ -743,6 +749,7 @@
     ];
     let cart = [];
     let activeDiscount = 0;
+    let appliedVoucherCode = null;
     let currentRating = 0;
     let currentCategory = 'all';
     let currency = 'USD';
@@ -932,12 +939,29 @@
       document.getElementById('cart-total').innerText = `Total: ${formatPrice(finalTotal)}`;
     }
 
+    /* ONE-TIME USE VOUCHER LOGIC */
     function applyVoucher() {
       const input = document.getElementById('voucher-input').value.trim().toUpperCase();
       const msg = document.getElementById('discount-msg');
 
+      if (!input) {
+        msg.innerText = "❌ Please enter a voucher code.";
+        msg.style.color = "var(--danger)";
+        return;
+      }
+
+      // Track redeemed vouchers in local storage per user
+      const usedVouchers = JSON.parse(localStorage.getItem('usedVouchers') || '[]');
+
+      if (usedVouchers.includes(input)) {
+        msg.innerText = "❌ You have already used this voucher code!";
+        msg.style.color = "var(--danger)";
+        return;
+      }
+
       if (typeof voucherDatabase !== 'undefined' && voucherDatabase[input]) {
         activeDiscount = voucherDatabase[input];
+        appliedVoucherCode = input;
         msg.innerText = `✓ Voucher applied! ${activeDiscount}% OFF discount added.`;
         msg.style.color = "var(--success)";
         updateCartUI();
@@ -948,6 +972,7 @@
     }
 
     function escapeHTML(str) {
+      if (!str) return '';
       return str.replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
       );
@@ -993,6 +1018,15 @@
 
       localStorage.setItem('customerShippingInfo', JSON.stringify(customerInfo));
 
+      // Save applied voucher to used list upon order completion
+      if (appliedVoucherCode) {
+        const usedVouchers = JSON.parse(localStorage.getItem('usedVouchers') || '[]');
+        if (!usedVouchers.includes(appliedVoucherCode)) {
+          usedVouchers.push(appliedVoucherCode);
+          localStorage.setItem('usedVouchers', JSON.stringify(usedVouchers));
+        }
+      }
+
       try {
         const response = await fetch("https://formspree.io/f/xqervlrw", {
           method: "POST",
@@ -1012,24 +1046,22 @@
         });
 
         alert("Order placed successfully! Thank you for purchasing.");
+      } catch (err) {
+        alert("Order completed! Thank you for purchasing.");
+      } finally {
         cart = [];
         activeDiscount = 0;
+        appliedVoucherCode = null;
         document.getElementById('discount-msg').innerText = '';
         document.getElementById('voucher-input').value = '';
         updateCartUI();
         closeCart();
-      } catch (err) {
-        alert("Order completed! Thank you for purchasing.");
-        cart = [];
-        updateCartUI();
-        closeCart();
-      } finally {
         checkoutBtn.disabled = false;
         checkoutBtn.innerText = "Complete Order";
       }
     }
 
-    /* REAL-TIME ONLINE REVIEWS SYSTEM (FIREBASE BACKEND) */
+    /* REAL-TIME ONLINE REVIEWS SYSTEM (WITH FIXED REVIEWS FALLBACK) */
     function setRating(val) {
       currentRating = val;
       const stars = document.querySelectorAll('#star-rating span');
@@ -1052,64 +1084,62 @@
       postBtn.disabled = true;
       postBtn.innerText = "Posting...";
 
-      // Save directly into global cloud database
       db.ref('public_reviews').push({
         name: escapeHTML(name),
-        msg: escapeHTML(msg),
+        message: escapeHTML(msg),
         rating: currentRating,
         timestamp: Date.now()
-      }, (error) => {
-        if (error) {
-          alert("Could not save review online. Please check your internet connection.");
-        } else {
-          document.getElementById('reviewer-name').value = '';
-          document.getElementById('reviewer-msg').value = '';
-          setRating(0);
-        }
+      }).then(() => {
+        document.getElementById('reviewer-name').value = '';
+        document.getElementById('reviewer-msg').value = '';
+        setRating(0);
+      }).catch(err => {
+        alert("Failed to post review. Please try again.");
+      }).finally(() => {
         postBtn.disabled = false;
         postBtn.innerText = "Post Review";
       });
     }
 
-    // Real-time synchronization: Listens for any new reviews posted by ANYONE on the internet
-    function listenForOnlineReviews() {
-      const container = document.getElementById('reviews-container');
-
-      db.ref('public_reviews').orderByChild('timestamp').on('value', (snapshot) => {
-        container.innerHTML = '';
-        const data = snapshot.val();
-
-        if (!data) {
-          container.innerHTML = '<p style="color: var(--text-gray);">No public reviews yet. Be the first to leave one!</p>';
-          return;
-        }
-
-        // Convert data object to array and show newest first
-        const reviewList = Object.values(data).reverse();
-
-        reviewList.forEach(r => {
-          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-          const dateStr = new Date(r.timestamp).toLocaleDateString();
-
-          container.innerHTML += `
-            <div class="review-bubble">
-              <div class="review-header">
-                <strong>${r.name}</strong>
-                <span style="color: #f59e0b; font-size: 14px;">${stars}</span>
-              </div>
-              <p style="color: var(--text-white); font-size: 14px; margin-top: 4px;">${r.msg}</p>
-              <small style="color: var(--text-gray); font-size: 11px; display: block; margin-top: 6px;">${dateStr}</small>
-            </div>
-          `;
-        });
-      });
+    function renderReviewBubble(name, rating, message) {
+      const starsHtml = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+      return `
+        <div class="review-bubble">
+          <div class="review-header">
+            <strong style="color: var(--accent);">${escapeHTML(name)}</strong>
+            <span style="color: #f59e0b; letter-spacing: 2px;">${starsHtml}</span>
+          </div>
+          <p style="color: var(--text-white); font-size: 14px; line-height: 1.4;">${escapeHTML(message)}</p>
+        </div>
+      `;
     }
 
-    // INITIALIZATION ON PAGE LOAD
-    window.addEventListener('DOMContentLoaded', () => {
-      renderProducts();
-      listenForOnlineReviews();
+    // Listen for live database updates & mix in fixed reviews
+    db.ref('public_reviews').on('value', (snapshot) => {
+      const container = document.getElementById('reviews-container');
+      container.innerHTML = '';
+      const data = snapshot.val();
+
+      let dynamicReviews = [];
+      if (data) {
+        dynamicReviews = Object.values(data).reverse();
+      }
+
+      // Render Firebase dynamic reviews first (newest)
+      dynamicReviews.forEach(item => {
+        container.innerHTML += renderReviewBubble(item.name, item.rating, item.message);
+      });
+
+      // Append fixed/default reviews at the bottom
+      fixedReviews.forEach(item => {
+        container.innerHTML += renderReviewBubble(item.name, item.rating, item.message);
+      });
     });
+
+    // Initial setup on window load
+    window.onload = () => {
+      renderProducts();
+    };
   </script>
 </body>
 </html>
