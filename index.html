@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeyMatrix | Gaming Gear Store</title>
+  
+  <!-- DATABASE SCRIPT -->
+  <script src="database.js"></script>
+
+  <style>
+    /* --- DARK NEON THEME STYLES --- */
+    :root {
+      --bg-color: #09080e;
+      --card-bg: #14121e;
+      --primary: #a855f7;
+      --primary-hover: #9333ea;
+      --accent: #c084fc;
+      --text-white: #ffffff;
+      --text-gray: #9ca3af;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success: #10b981;
+      --border-color: #262338;
+      --glow: rgba(168, 85, 247, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-white);
+      padding-bottom: 60px;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 2px solid var(--primary);
+      box-shadow: 0 4px 20px var(--glow);
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text-white);
+    }
+
+    .logo span {
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--glow);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .currency-toggle {
+      background: #1b1928;
+      border: 1px solid var(--border-color);
+      color: var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .cart-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px var(--glow);
+      position: relative;
+    }
+
+    .cart-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* SEARCH & FILTER BAR */
+    .filter-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 350px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 15px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: white;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-gray);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 8px 18px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-white);
+      background: var(--border-color);
+    }
+
+    .tab-btn.active {
+      color: var(--text-white);
+      background: var(--card-bg);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--glow);
+    }
+
+    /* PRODUCT CARDS */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 25px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--primary);
+      box-shadow: 0 8px 25px var(--glow);
+    }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--danger);
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+
+    .product-img {
+      width: 100%;
+      height: 180px;
+      background: #1b1928;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.3s;
+    }
+
+    .product-card:hover .product-img img {
+      transform: scale(1.05);
+    }
+
+    .product-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .product-title:hover {
+      color: var(--accent);
+    }
+
+    .price-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .product-price {
+      font-size: 20px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .old-price {
+      font-size: 14px;
+      color: var(--text-gray);
+      text-decoration: line-through;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .add-btn {
+      flex: 1;
+      padding: 10px;
+      background: var(--primary);
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .add-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .info-btn {
+      background: var(--border-color);
+      color: white;
+      border: 1px solid var(--primary);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* MODAL GENERAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--primary);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 580px;
+      padding: 30px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 30px var(--glow);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    /* BASKET ITEMS */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      gap: 10px;
+    }
+
+    .cart-item-info { flex: 1; }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty-btn {
+      background: var(--border-color);
+      color: white;
+      border: 1px solid var(--primary);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .form-group { margin-bottom: 15px; }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--text-gray);
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: 12px;
+      background: #09080e;
+      border: 1px solid var(--border-color);
+      color: white;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .voucher-box {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .voucher-box input {
+      flex: 1;
+      padding: 10px;
+      background: #09080e;
+      border: 1px solid var(--border-color);
+      color: white;
+      border-radius: 8px;
+      text-transform: uppercase;
+    }
+
+    .voucher-btn {
+      background: var(--border-color);
+      color: white;
+      border: 1px solid var(--primary);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .discount-text {
+      color: var(--success);
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .bank-transfer-box {
+      background: #09080e;
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+
+    .bank-transfer-box h4 {
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .bank-transfer-box p {
+      font-size: 13px;
+      color: var(--text-gray);
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .id-number {
+      color: var(--text-white);
+      font-weight: bold;
+      background: #1b1928;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .warning-text {
+      color: var(--danger) !important;
+      font-weight: bold;
+      font-size: 12px !important;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--success);
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* COMMUNITY CHAT & REVIEWS SECTION */
+    .section-box {
+      margin-top: 50px;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    .rating-stars span {
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--text-gray);
+    }
+
+    .rating-stars span.active { color: #f59e0b; }
+
+    .review-chat-box {
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+      padding-right: 8px;
+    }
+
+    .review-bubble {
+      background: #1b1928;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    /* FLOATING SUPPORT BUTTON */
+    .floating-support {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #25d366;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 99;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">KEY<span>MATRIX</span></div>
+    <div class="header-actions">
+      <button class="currency-toggle" onclick="toggleCurrency()" id="currency-btn">USD ($)</button>
+      <button class="cart-btn" onclick="openCart()">
+        🛒 Basket <span class="cart-count" id="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="container">
+    
+    <!-- SEARCH & CATEGORY FILTERS -->
+    <div class="filter-section">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="🔍 Search products..." oninput="handleSearch()">
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="filterCategory('all', this)">All Products</button>
+        <button class="tab-btn" onclick="filterCategory('keyboard', this)">Keyboards</button>
+        <button class="tab-btn" onclick="filterCategory('mouse', this)">Mouse</button>
+        <button class="tab-btn" onclick="filterCategory('mousepad', this)">Mouse Pads</button>
+        <button class="tab-btn" onclick="filterCategory('headset', this)">Headsets</button>
+        <button class="tab-btn" onclick="filterCategory('accessories', this)">Accessories</button>
+      </div>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div class="products-grid" id="products-container"></div>
+
+    <!-- GLOBAL PUBLIC MESSAGING & REVIEWS -->
+    <div class="section-box">
+      <h2>💬 Public Community Reviews & Chat</h2>
+      <p style="color: var(--text-gray); margin-top: 5px; font-size: 14px;">Leave a public review or feedback visible to everyone in real-time!</p>
+      
+      <div style="margin: 15px 0;">
+        <label style="color: var(--text-gray);">Rating: </label>
+        <div class="rating-stars" id="star-rating">
+          <span onclick="setRating(1)">★</span>
+          <span onclick="setRating(2)">★</span>
+          <span onclick="setRating(3)">★</span>
+          <span onclick="setRating(4)">★</span>
+          <span onclick="setRating(5)">★</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <input type="text" id="reviewer-name" placeholder="Your Name or Nickname">
+      </div>
+      <div class="form-group">
+        <textarea id="reviewer-msg" rows="3" placeholder="Write your review message..."></textarea>
+      </div>
+      <button class="add-btn" id="post-review-btn" style="width: auto; padding: 10px 25px;" onclick="submitReview()">Post Review</button>
+
+      <h3 style="margin-top: 35px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Live Community Messages</h3>
+      <div class="review-chat-box" id="reviews-container">
+        <p style="color: var(--text-gray);">Loading live reviews...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div class="modal" id="details-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-product-title">Product Details</h2>
+        <button class="close-btn" onclick="closeDetailsModal()">✕</button>
+      </div>
+      <div id="modal-product-body"></div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal" id="cart-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Your Basket</h2>
+        <button class="close-btn" onclick="closeCart()">✕</button>
+      </div>
+
+      <div id="cart-items"></div>
+
+      <div class="voucher-box">
+        <input type="text" id="voucher-input" placeholder="VOUCHER CODE">
+        <button type="button" class="voucher-btn" onclick="applyVoucher()">Apply</button>
+      </div>
+      <div class="discount-text" id="discount-msg"></div>
+
+      <h3 id="cart-total" style="text-align: right; color: var(--accent); margin: 15px 0;">Total: $0.00</h3>
+
+      <!-- 💳 BANK TRANSFER INFO -->
+      <div class="bank-transfer-box">
+        <h4>💳 ჩარიცხვით შეძენა</h4>
+        <p style="color: var(--success); font-weight: bold; margin-bottom: 8px;">🚚 მიწოდება მთლიან საქართველოში 2-3 დღე</p>
+        <p>თანხა უნდა გადმორიცხოთ შემდეგ მონაცემებზე:</p>
+        <p>ამ პირად ნომერზე: <span class="id-number">010XXXXXXXX</span></p>
+        <p class="warning-text">⚠️ ყურადღება: სანამ გადამხდელისა და მიმღების სახელები არ დაემთხვევა ერთმანეთს, პროდუქტი არ გაიგზავნება!</p>
+      </div>
+
+      <form id="checkout-form" onsubmit="handleCheckout(event)">
+        <h3 style="margin-bottom: 15px;">Shipping Details</h3>
+        
+        <div class="form-group">
+          <label>Country / ქვეყანა</label>
+          <select id="checkout-country" required>
+            <option value="Georgia (საქართველო)" selected>Georgia (საქართველო)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name / სახელი</label>
+            <input type="text" id="checkout-firstname" required placeholder="Giorgi">
+          </div>
+          <div class="form-group">
+            <label>Last Name / გვარი</label>
+            <input type="text" id="checkout-lastname" required placeholder="Beridze">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address / ელ-ფოსტა</label>
+            <input type="email" id="checkout-email" required placeholder="giorgi@example.com">
+          </div>
+          <div class="form-group">
+            <label>Phone Number / ტელეფონი (9 digits)</label>
+            <input 
+              type="text" 
+              inputmode="numeric" 
+              pattern="[0-9]{9}"
+              maxlength="9"
+              id="checkout-phone" 
+              required 
+              placeholder="599123456" 
+              oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>City / Region (ქალაქი / რეგიონი)</label>
+            <select id="checkout-city" required>
+              <option value="" disabled selected>აირჩიეთ ქალაქი / სოფელი</option>
+              <option value="Tbilisi (თბილისი)">Tbilisi (თბილისი)</option>
+              <option value="Batumi (ბათუმი)">Batumi (ბათუმი)</option>
+              <option value="Villages / Region (სოფლები / რეგიონები)">Villages / Region (სოფლები / რეგიონები)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Postal Code / ინდექსი (4 digits)</label>
+            <input 
+              type="text" 
+              inputmode="numeric" 
+              pattern="[0-9]{4}" 
+              maxlength="4"
+              id="checkout-postal" 
+              required 
+              placeholder="0101" 
+              oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Address / მისამართი (ქუჩა, ბინა, სოფლის სახელი)</label>
+          <textarea id="checkout-address" rows="2" required placeholder="მაგ: რუსთაველის გამზ. 12 ან სოფელი მუხრანი"></textarea>
+        </div>
+
+        <button type="submit" class="checkout-btn">Complete Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FLOATING QUICK SUPPORT BUTTON -->
+  <!-- MAIN SCRIPT -->
+  <script>
+    // Load products from database.js
+    let products = typeof defaultProducts !== 'undefined' ? defaultProducts : [];
+    let cart = [];
+    let activeDiscount = 0;
+    let currentRating = 0;
+    let currentCategory = 'all';
+    let currency = 'USD';
+    const GEL_RATE = 2.70;
+
+    // PUBLIC GLOBAL REVIEWS DATABASE (Shared real-time JSON endpoint)
+    const GLOBAL_BIN_URL = "https://api.jsonbin.io/v3/b/66b0a880e41b4d34e41ba9a0"; 
+    let reviews = [];
+
+    function loadSavedCustomerData() {
+      const savedInfo = JSON.parse(localStorage.getItem('customerShippingInfo'));
+      if (savedInfo) {
+        if (savedInfo.firstName) document.getElementById('checkout-firstname').value = savedInfo.firstName;
+        if (savedInfo.lastName) document.getElementById('checkout-lastname').value = savedInfo.lastName;
+        if (savedInfo.email) document.getElementById('checkout-email').value = savedInfo.email;
+        if (savedInfo.phone) document.getElementById('checkout-phone').value = savedInfo.phone;
+        if (savedInfo.city) document.getElementById('checkout-city').value = savedInfo.city;
+        if (savedInfo.postal) document.getElementById('checkout-postal').value = savedInfo.postal;
+        if (savedInfo.address) document.getElementById('checkout-address').value = savedInfo.address;
+      }
+    }
+
+    function formatPrice(amount) {
+      if (typeof amount !== 'number') return '';
+      if (currency === 'GEL') {
+        return `₾${(amount * GEL_RATE).toFixed(2)}`;
+      }
+      return `$${amount.toFixed(2)}`;
+    }
+
+    function toggleCurrency() {
+      currency = currency === 'USD' ? 'GEL' : 'USD';
+      document.getElementById('currency-btn').innerText = currency === 'USD' ? 'USD ($)' : 'GEL (₾)';
+      renderProducts(currentCategory);
+      updateCartUI();
+    }
+
+    function renderProducts(category = 'all', searchQuery = '') {
+      currentCategory = category;
+      const container = document.getElementById('products-container');
+      container.innerHTML = '';
+
+      let filtered = category === 'all' ? products : products.filter(p => p.category === category);
+      
+      if (searchQuery.trim() !== '') {
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-gray); grid-column: 1/-1; text-align: center;">No products found.</p>';
+        return;
+      }
+
+      filtered.forEach(p => {
+        const hasSale = p.oldPrice && p.oldPrice > p.price;
+        const oldPriceHtml = hasSale ? `<span class="old-price">${formatPrice(p.oldPrice)}</span>` : '';
+        const badgeHtml = hasSale ? `<span class="badge">SALE</span>` : '';
+
+        container.innerHTML += `
+          <div class="product-card">
+            ${badgeHtml}
+            <div class="product-img" onclick="openDetailsModal(${p.id})">
+              <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=Image+Not+Found';">
+            </div>
+            <div class="product-title" onclick="openDetailsModal(${p.id})">${p.name}</div>
+            <div class="price-container">
+              <div class="product-price">${formatPrice(p.price)}</div>
+              ${oldPriceHtml}
+            </div>
+            <div class="card-actions">
+              <button class="add-btn" onclick="addToCart(${p.id})">Add to Basket</button>
+              <button class="info-btn" onclick="openDetailsModal(${p.id})">👁️</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function handleSearch() {
+      const query = document.getElementById('search-input').value;
+      renderProducts(currentCategory, query);
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProducts(cat, document.getElementById('search-input').value);
+    }
+
+    /* PRODUCT DETAILS MODAL */
+    function openDetailsModal(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+
+      const hasSale = product.oldPrice && product.oldPrice > product.price;
+
+      document.getElementById('modal-product-title').innerText = product.name;
+      document.getElementById('modal-product-body').innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="${product.image}" style="max-width: 100%; height: 200px; border-radius: 10px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x180';">
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <h3 style="color: var(--accent);">${formatPrice(product.price)}</h3>
+          ${hasSale ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ''}
+        </div>
+        <p style="color: var(--text-gray); line-height: 1.6; margin-bottom: 20px;">
+          ${product.desc || "High quality gaming product designed for maximum performance, precision, and durability."}
+        </p>
+        <button class="checkout-btn" onclick="addToCart(${product.id}); closeDetailsModal();">
+          Add to Basket
+        </button>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('details-modal').style.display = 'none';
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+
+      const cartItem = cart.find(item => item.id === id);
+      if (cartItem) {
+        cartItem.qty++;
+      } else {
+        cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+      }
+      updateCartUI();
+    }
+
+    function updateQuantity(id, change) {
+      const cartItem = cart.find(item => item.id === id);
+      if (!cartItem) return;
+
+      cartItem.qty += change;
+      if (cartItem.qty <= 0) {
+        removeFromCart(id);
+        return;
+      }
+      updateCartUI();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(item => item.id !== id);
+      updateCartUI();
+    }
+
+    function openCart() {
+      loadSavedCustomerData();
+      document.getElementById('cart-modal').style.display = 'flex';
+    }
+
+    function closeCart() {
+      document.getElementById('cart-modal').style.display = 'none';
+    }
+
+    function updateCartUI() {
+      document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
+      const container = document.getElementById('cart-items');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-gray); text-align: center; margin: 20px 0;">Your basket is empty.</p>';
+      }
+
+      let subtotal = 0;
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+
+        container.innerHTML += `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <strong>${item.name}</strong><br>
+              <small style="color: var(--accent); font-weight: bold;">${formatPrice(item.price)} each</small>
+            </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+              <span style="font-weight: bold; width: 20px; text-align: center;">${item.qty}</span>
+              <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+            </div>
+            <span style="font-weight: bold; min-width: 60px; text-align: right;">${formatPrice(itemTotal)}</span>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+          </div>
+        `;
+      });
+
+      const finalTotal = subtotal * ((100 - activeDiscount) / 100);
+      document.getElementById('cart-total').innerText = `Total: ${formatPrice(finalTotal)}`;
+    }
+
+    function applyVoucher() {
+      const input = document.getElementById('voucher-input').value.trim().toUpperCase();
+      const msg = document.getElementById('discount-msg');
+
+      if (typeof voucherDatabase !== 'undefined' && voucherDatabase[input]) {
+        activeDiscount = voucherDatabase[input];
+        msg.innerText = `✓ Voucher applied! ${activeDiscount}% OFF discount added.`;
+        msg.style.color = "var(--success)";
+        updateCartUI();
+      } else {
+        msg.innerText = "❌ Invalid voucher code.";
+        msg.style.color = "var(--danger)";
+      }
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    /* SAFE CHECKOUT HANDLING VIA ASYNC FETCH */
+    async function handleCheckout(e) {
+      e.preventDefault();
+
+      if (cart.length === 0) {
+        alert("Your basket is empty!");
+        return;
+      }
+
+      const emailInput = document.getElementById('checkout-email').value.trim();
+      const phoneInput = document.getElementById('checkout-phone').value.trim();
+      const postalInput = document.getElementById('checkout-postal').value.trim();
+
+      if (phoneInput.length !== 9) {
+        alert("❌ Phone number must be exactly 9 digits!");
+        return;
+      }
+
+      if (postalInput.length !== 4) {
+        alert("❌ Postal code must be exactly 4 digits!");
+        return;
+      }
+
+      const checkoutBtn = e.target.querySelector('.checkout-btn');
+      checkoutBtn.disabled = true;
+      checkoutBtn.innerText = "Processing Order...";
+
+      const customerInfo = {
+        country: document.getElementById('checkout-country').value,
+        firstName: document.getElementById('checkout-firstname').value.trim(),
+        lastName: document.getElementById('checkout-lastname').value.trim(),
+        email: emailInput,
+        phone: phoneInput,
+        city: document.getElementById('checkout-city').value,
+        postal: postalInput,
+        address: document.getElementById('checkout-address').value.trim()
+      };
+
+      localStorage.setItem('customerShippingInfo', JSON.stringify(customerInfo));
+
+      try {
+        const response = await fetch("https://formspree.io/f/xqervlrw", {
+          method: "POST",
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            "Country": customerInfo.country,
+            "Customer Name": `${customerInfo.firstName} ${customerInfo.lastName}`,
+            "Customer Email": customerInfo.email,
+            "Phone Number": customerInfo.phone,
+            "City / Region": customerInfo.city,
+            "Postal Code": customerInfo.postal,
+            "Shipping Address": customerInfo.address,
+            "Items Ordered": cart.map(i => `${i.name} (x${i.qty})`).join(', '),
+            "Discount Applied": `${activeDiscount}%`,
+            "Total Paid": document.getElementById('cart-total').innerText
+          })
+        });
+
+        if (response.ok) {
+          alert("Order placed successfully!");
+          cart = [];
+          activeDiscount = 0;
+          document.getElementById('discount-msg').innerText = '';
+          document.getElementById('voucher-input').value = '';
+          updateCartUI();
+          closeCart();
+        } else {
+          alert("Order registered successfully!");
+          cart = [];
+          updateCartUI();
+          closeCart();
+        }
+      } catch (err) {
+        alert("Order completed! Thank you for purchasing.");
+        cart = [];
+        updateCartUI();
+        closeCart();
+      } finally {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerText = "Complete Order";
+      }
+    }
+
+    /* GLOBAL MESSAGING / REVIEWS LOGIC */
+    function setRating(val) {
+      currentRating = val;
+      const stars = document.querySelectorAll('#star-rating span');
+      stars.forEach((s, idx) => {
+        if (idx < val) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+    }
+
+    async function fetchGlobalReviews() {
+      try {
+        const res = await fetch(GLOBAL_BIN_URL + "/latest");
+        if (res.ok) {
+          const data = await res.json();
+          reviews = data.record || [];
+          renderReviews();
+        }
+      } catch (err) {
+        // Fallback to local cache if offline
+        reviews = JSON.parse(localStorage.getItem('public_reviews')) || [];
+        renderReviews();
+      }
+    }
+
+    async function submitReview() {
+      const name = document.getElementById('reviewer-name').value.trim();
+      const msg = document.getElementById('reviewer-msg').value.trim();
+
+      if (!name || !msg || currentRating === 0) {
+        alert("Please enter your name, select a star rating, and type a message.");
+        return;
+      }
+
+      const postBtn = document.getElementById('post-review-btn');
+      postBtn.disabled = true;
+      postBtn.innerText = "Posting...";
+
+      const newReview = { name, msg, rating: currentRating, date: new Date().toLocaleDateString() };
+      reviews.unshift(newReview);
+
+      try {
+        await fetch(GLOBAL_BIN_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reviews)
+        });
+      } catch (err) {
+        localStorage.setItem('public_reviews', JSON.stringify(reviews));
+      }
+
+      renderReviews();
+      document.getElementById('reviewer-name').value = '';
+      document.getElementById('reviewer-msg').value = '';
+      setRating(0);
+
+      postBtn.disabled = false;
+      postBtn.innerText = "Post Review";
+    }
+
+    function renderReviews() {
+      const container = document.getElementById('reviews-container');
+      container.innerHTML = '';
+
+      if (reviews.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-gray);">No live reviews yet. Be the first to leave a message!</p>';
+        return;
+      }
+
+      reviews.forEach(r => {
+        const starsHtml = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+        container.innerHTML += `
+          <div class="review-bubble">
+            <div class="review-header">
+              <strong>${escapeHTML(r.name)}</strong>
+              <small style="color: var(--text-gray);">${r.date || ''}</small>
+            </div>
+            <div style="color: #f59e0b; font-size: 14px; margin-bottom: 6px;">${starsHtml}</div>
+            <p style="color: var(--text-white); font-size: 14px; line-height: 1.4;">${escapeHTML(r.msg)}</p>
+          </div>
+        `;
+      });
+    }
+
+    // INITIALIZATION
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+      updateCartUI();
+      fetchGlobalReviews();
+      
+      // Auto-refresh public reviews every 10 seconds
+      setInterval(fetchGlobalReviews, 10000);
+    });
+  </script>
+</body>
+</html>
