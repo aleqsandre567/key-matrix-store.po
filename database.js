@@ -14,7 +14,7 @@ const defaultProducts = [
     id: 1, 
     name: "Clix x Matrix 60% Gaming Keyboard Blue Switch RGB", 
     category: "keyboard", 
-    price: 91,
+    price: 89,
     oldPrice: 119.99, // Triggers SALE badge
     stock: 2,
     image: "images/keyboard1.png" 
