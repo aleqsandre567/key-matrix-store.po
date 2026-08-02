@@ -42,6 +42,24 @@
       overflow-x: hidden;
     }
 
+    /* BACKGROUND LOGO OVERLAY */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      background-image: url('images/logo.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: -1;
+    }
+
     /* KEYFRAME ANIMATIONS */
     @keyframes fadeInPage {
       from { opacity: 0; transform: translateY(10px); }
@@ -718,7 +736,7 @@
       padding-right: 8px;
     }
 
-    .review-bubble {
+    .review-bubble, .review-card {
       background: #1b1928;
       border: 1px solid var(--border-color);
       border-radius: 12px;
@@ -727,7 +745,7 @@
       transition: border-color 0.3s ease;
     }
 
-    .review-bubble:hover {
+    .review-bubble:hover, .review-card:hover {
       border-color: var(--accent);
     }
 
@@ -737,30 +755,13 @@
       align-items: center;
       margin-bottom: 6px;
     }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 700px;                  /* Size of the background logo */
-      height: 700px;
-      background-image: url('images/logo.png');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      opacity: 0.06;                 /* Controls transparency (0.05 - 0.15 works best) */
-      pointer-events: none;          /* Allows clicking through to buttons underneath */
-      z-index: -1;                   /* Keeps it strictly behind all content */
-    }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
-   <header>
+  <header>
     <div class="logo">
-      <!-- High Quality KeyMatrix Logo Image -->
       <img src="images/logo.png" alt="KEYMATRIX Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/45/a855f7/ffffff?text=KM';">
       KEY<span>MATRIX</span>
     </div>
@@ -951,29 +952,56 @@
     </div>
   </div>
 
-  <!-- MAIN SCRIPT -->
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
   <script>
-    // 1. FIREBASE CONFIGURATION
+    // 1. Connect to Firebase
     const firebaseConfig = {
-      databaseURL: "https://keymatrix-store-default-rtdb.firebaseio.com"
+      databaseURL: "https://keymatrix-f71af-default-rtdb.firebaseio.com"
     };
     
-    let db = null;
-    try {
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      db = firebase.database();
-    } catch (e) {
-      console.warn("Firebase initialized via fallback storage mode.");
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
+
+    // 2. Send Review to Cloud
+    function submitReviewToCloud(name, rating, comment) {
+      database.ref('keymatrix_reviews').push({
+        name: name,
+        rating: rating,
+        comment: comment,
+        timestamp: Date.now()
+      });
     }
 
-    const fixedReviews = [
-      { name: "Saba G.", rating: 5, message: "ძალიან სწრაფი მიწოდება იყო! კლავიატურა იდეალურ მდგომარეობაში ჩამოვიდა." },
-      { name: "Nika_Gamer", rating: 5, message: "AttackShark and Aula gear here is top tier. Best store!" },
-      { name: "Luka", rating: 4, message: "კარგი ხარისხის მაუსპადი, ძალიან რბილია და ხელი არ მეღლება." }
-    ];
+    // 3. Sync Reviews Live Across ALL Visitors
+    database.ref('keymatrix_reviews').on('value', (snapshot) => {
+      const reviewsData = snapshot.val();
+      const reviewsContainer = document.getElementById('reviews-container');
+      
+      if (!reviewsContainer) return;
+      reviewsContainer.innerHTML = '';
 
+      if (reviewsData) {
+        Object.keys(reviewsData).forEach((key) => {
+          const rev = reviewsData[key];
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          card.innerHTML = `
+            <h4>${rev.name} - ${'⭐'.repeat(rev.rating)}</h4>
+            <p>${rev.comment || rev.message || ''}</p>
+          `;
+          reviewsContainer.prepend(card);
+        });
+      }
+    });
+  </script>
+
+  <!-- MAIN SCRIPT -->
+  <script>
     let products = typeof defaultProducts !== 'undefined' ? defaultProducts : [
       { id: 1, name: "AttackShark L80PRO", category: "headset", price: 139.00, oldPrice: 239.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AttackShark+L80PRO", desc: "Professional wireless gaming headset with crystal clear audio mic." },
       { id: 2, name: "Ajazz AK820", category: "keyboard", price: 229.00, oldPrice: 299.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Ajazz+AK820", desc: "Custom mechanical keyboard with premium switches and knobs." },
@@ -1043,9 +1071,9 @@
         card.innerHTML = `
           ${badgeHtml}
           <div class="product-img" onclick="openDetailsModal(${p.id})">
-            <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=KeyMatrix+Gear';">
+            <img src="${p.image}" alt="${escapeHTML(p.name)}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=KeyMatrix+Gear';">
           </div>
-          <div class="product-title" onclick="openDetailsModal(${p.id})">${p.name}</div>
+          <div class="product-title" onclick="openDetailsModal(${p.id})">${escapeHTML(p.name)}</div>
           <div class="price-container">
             <div class="product-price">${formatPrice(p.price)}</div>
             ${oldPriceHtml}
@@ -1087,7 +1115,7 @@
           ${hasSale ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ''}
         </div>
         <p style="color: var(--text-gray); line-height: 1.6; margin-bottom: 20px;">
-          ${product.desc || "Premium build quality, ergonomic precision, and superior gaming performance."}
+          ${escapeHTML(product.desc) || "Premium build quality, ergonomic precision, and superior gaming performance."}
         </p>
         <button class="checkout-btn" onclick="addToCart(${product.id}); closeDetailsModal();">
           კალათაში დამატება
@@ -1113,7 +1141,6 @@
         cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
       }
       
-      // Animate Cart Badge
       const badge = document.getElementById('cart-count');
       badge.style.transform = 'scale(1.4)';
       setTimeout(() => badge.style.transform = 'scale(1)', 200);
@@ -1166,7 +1193,7 @@
         container.innerHTML += `
           <div class="cart-item">
             <div class="cart-item-info">
-              <strong>${item.name}</strong><br>
+              <strong>${escapeHTML(item.name)}</strong><br>
               <small style="color: var(--accent); font-weight: bold;">${formatPrice(item.price)} each</small>
             </div>
             <div class="qty-controls">
@@ -1219,7 +1246,7 @@
 
     function escapeHTML(str) {
       if (!str) return '';
-      return str.replace(/[&<>'"]/g, 
+      return String(str).replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
       );
     }
@@ -1232,8 +1259,15 @@
         return;
       }
 
+      const emailInput = document.getElementById('checkout-email').value.trim();
       const phoneInput = document.getElementById('checkout-phone').value.trim();
       const postalInput = document.getElementById('checkout-postal').value.trim();
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(emailInput)) {
+        alert("unknown email");
+        return;
+      }
 
       if (phoneInput.length !== 9) {
         alert("❌ Phone number must be exactly 9 digits!");
@@ -1253,7 +1287,7 @@
         country: document.getElementById('checkout-country').value,
         firstName: document.getElementById('checkout-firstname').value.trim(),
         lastName: document.getElementById('checkout-lastname').value.trim(),
-        email: document.getElementById('checkout-email').value.trim(),
+        email: emailInput,
         phone: phoneInput,
         city: document.getElementById('checkout-city').value,
         postal: postalInput,
@@ -1326,80 +1360,13 @@
       postBtn.disabled = true;
       postBtn.innerText = "Posting...";
 
-      const newReview = {
-        name: escapeHTML(name),
-        message: escapeHTML(msg),
-        rating: currentRating,
-        timestamp: Date.now()
-      };
+      submitReviewToCloud(name, currentRating, msg);
 
-      if (db) {
-        db.ref('keymatrix_reviews').push(newReview).then(() => {
-          finishReviewPost();
-        }).catch(() => {
-          saveLocalReview(newReview);
-          finishReviewPost();
-        });
-      } else {
-        saveLocalReview(newReview);
-        finishReviewPost();
-      }
-    }
-
-    function saveLocalReview(reviewObj) {
-      const localReviews = JSON.parse(localStorage.getItem('keymatrix_local_reviews') || '[]');
-      localReviews.unshift(reviewObj);
-      localStorage.setItem('keymatrix_local_reviews', JSON.stringify(localReviews));
-      renderAllReviews();
-    }
-
-    function finishReviewPost() {
       document.getElementById('reviewer-name').value = '';
       document.getElementById('reviewer-msg').value = '';
       setRating(0);
-      const postBtn = document.getElementById('post-review-btn');
       postBtn.disabled = false;
       postBtn.innerText = "Post Review";
-    }
-
-    function renderReviewBubble(name, rating, message) {
-      const starsHtml = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-      return `
-        <div class="review-bubble">
-          <div class="review-header">
-            <strong style="color: var(--accent);">${escapeHTML(name)}</strong>
-            <span style="color: #f59e0b; letter-spacing: 2px;">${starsHtml}</span>
-          </div>
-          <p style="color: var(--text-white); font-size: 14px; line-height: 1.4;">${escapeHTML(message)}</p>
-        </div>
-      `;
-    }
-
-    function renderAllReviews(firebaseData = []) {
-      const container = document.getElementById('reviews-container');
-      container.innerHTML = '';
-
-      const localReviews = JSON.parse(localStorage.getItem('keymatrix_local_reviews') || '[]');
-
-      [...localReviews, ...firebaseData].forEach(item => {
-        container.innerHTML += renderReviewBubble(item.name, item.rating, item.message);
-      });
-
-      fixedReviews.forEach(item => {
-        container.innerHTML += renderReviewBubble(item.name, item.rating, item.message);
-      });
-    }
-
-    if (db) {
-      db.ref('keymatrix_reviews').on('value', (snapshot) => {
-        const data = snapshot.val();
-        let fbReviews = data ? Object.values(data).reverse() : [];
-        renderAllReviews(fbReviews);
-      }, () => {
-        renderAllReviews();
-      });
-    } else {
-      renderAllReviews();
     }
 
     window.onload = () => {
