@@ -991,7 +991,7 @@
           const card = document.createElement('div');
           card.className = 'review-card';
           card.innerHTML = `
-            <h4>${rev.name} - ${'⭐'.repeat(rev.rating)}</h4>
+            <h4>${rev.name} - ${'★'.repeat(rev.rating)}</h4>
             <p>${rev.comment || rev.message || ''}</p>
           `;
           reviewsContainer.prepend(card);
