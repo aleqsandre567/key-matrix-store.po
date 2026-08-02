@@ -755,6 +755,22 @@
       align-items: center;
       margin-bottom: 6px;
     }
+
+    /* SVG STAR STYLES */
+    .review-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    .star-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -985,13 +1001,43 @@
       if (!reviewsContainer) return;
       reviewsContainer.innerHTML = '';
 
+      // Generates precise SVG stars (supports half-stars like 4.5)
+      const getStarsSVG = (rating = 5) => {
+        const numRating = parseFloat(rating) || 0;
+        let starsHTML = '';
+        
+        for (let i = 1; i <= 5; i++) {
+          let fillPercent = 0;
+          if (numRating >= i) {
+            fillPercent = 100;
+          } else if (numRating > i - 1) {
+            fillPercent = Math.round((numRating - (i - 1)) * 100);
+          }
+
+          const gradId = `star-grad-${Math.random().toString(36).substring(2, 9)}`;
+
+          starsHTML += `
+            <svg class="star-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <defs>
+                <linearGradient id="${gradId}">
+                  <stop offset="${fillPercent}%" stop-color="#FFB800" />
+                  <stop offset="${fillPercent}%" stop-color="#334155" />
+                </linearGradient>
+              </defs>
+              <path fill="url(#${gradId})" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+          `;
+        }
+        return `<span class="review-stars">${starsHTML}</span>`;
+      };
+
       if (reviewsData) {
         Object.keys(reviewsData).forEach((key) => {
           const rev = reviewsData[key];
           const card = document.createElement('div');
           card.className = 'review-card';
           card.innerHTML = `
-            <h4>${rev.name} - ${'★'.repeat(rev.rating)}</h4>
+            <h4>${rev.name || 'Anonymous'} - ${getStarsSVG(rev.rating)}</h4>
             <p>${rev.comment || rev.message || ''}</p>
           `;
           reviewsContainer.prepend(card);
@@ -1015,6 +1061,10 @@
     let currentRating = 0;
     let currentCategory = 'all';
     let currency = 'GEL';
+
+    function escapeHTML(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
 
     function loadSavedCustomerData() {
       const savedInfo = JSON.parse(localStorage.getItem('customerShippingInfo'));
@@ -1098,252 +1148,15 @@
       renderProducts(cat, document.getElementById('search-input').value);
     }
 
-    /* PRODUCT DETAILS MODAL */
-    function openDetailsModal(id) {
-      const product = products.find(p => p.id === id);
-      if (!product) return;
-
-      const hasSale = product.oldPrice && product.oldPrice > product.price;
-
-      document.getElementById('modal-product-title').innerText = product.name;
-      document.getElementById('modal-product-body').innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img src="${product.image}" style="max-width: 100%; height: 200px; border-radius: 10px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x180';">
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-          <h3 style="color: var(--accent);">${formatPrice(product.price)}</h3>
-          ${hasSale ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ''}
-        </div>
-        <p style="color: var(--text-gray); line-height: 1.6; margin-bottom: 20px;">
-          ${escapeHTML(product.desc) || "Premium build quality, ergonomic precision, and superior gaming performance."}
-        </p>
-        <button class="checkout-btn" onclick="addToCart(${product.id}); closeDetailsModal();">
-          კალათაში დამატება
-        </button>
-      `;
-      const modal = document.getElementById('details-modal');
-      modal.classList.add('show');
-    }
-
-    function closeDetailsModal() {
-      const modal = document.getElementById('details-modal');
-      modal.classList.remove('show');
-    }
-
-    function addToCart(id) {
-      const product = products.find(p => p.id === id);
-      if (!product) return;
-
-      const cartItem = cart.find(item => item.id === id);
-      if (cartItem) {
-        cartItem.qty++;
-      } else {
-        cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
-      }
-      
-      const badge = document.getElementById('cart-count');
-      badge.style.transform = 'scale(1.4)';
-      setTimeout(() => badge.style.transform = 'scale(1)', 200);
-
-      updateCartUI();
-    }
-
-    function updateQuantity(id, change) {
-      const cartItem = cart.find(item => item.id === id);
-      if (!cartItem) return;
-
-      cartItem.qty += change;
-      if (cartItem.qty <= 0) {
-        removeFromCart(id);
-        return;
-      }
-      updateCartUI();
-    }
-
-    function removeFromCart(id) {
-      cart = cart.filter(item => item.id !== id);
-      updateCartUI();
-    }
-
-    function openCart() {
-      loadSavedCustomerData();
-      const modal = document.getElementById('cart-modal');
-      modal.classList.add('show');
-    }
-
-    function closeCart() {
-      const modal = document.getElementById('cart-modal');
-      modal.classList.remove('show');
-    }
-
-    function updateCartUI() {
-      document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
-      const container = document.getElementById('cart-items');
-      container.innerHTML = '';
-
-      if (cart.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-gray); text-align: center; margin: 20px 0;">Your basket is empty.</p>';
-      }
-
-      let subtotal = 0;
-      cart.forEach(item => {
-        const itemTotal = item.price * item.qty;
-        subtotal += itemTotal;
-
-        container.innerHTML += `
-          <div class="cart-item">
-            <div class="cart-item-info">
-              <strong>${escapeHTML(item.name)}</strong><br>
-              <small style="color: var(--accent); font-weight: bold;">${formatPrice(item.price)} each</small>
-            </div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-              <span style="font-weight: bold; width: 20px; text-align: center;">${item.qty}</span>
-              <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-            </div>
-            <span style="font-weight: bold; min-width: 60px; text-align: right;">${formatPrice(itemTotal)}</span>
-            <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
-          </div>
-        `;
-      });
-
-      const finalTotal = subtotal * ((100 - activeDiscount) / 100);
-      document.getElementById('cart-total').innerText = `Total: ${formatPrice(finalTotal)}`;
-    }
-
-    function applyVoucher() {
-      const input = document.getElementById('voucher-input').value.trim().toUpperCase();
-      const msg = document.getElementById('discount-msg');
-
-      if (!input) {
-        msg.innerText = "❌ Please enter a voucher code.";
-        msg.style.color = "var(--danger)";
-        return;
-      }
-
-      const usedVouchers = JSON.parse(localStorage.getItem('keymatrix_used_vouchers') || '[]');
-
-      if (usedVouchers.includes(input)) {
-        msg.innerText = "❌ This voucher has already been used once!";
-        msg.style.color = "var(--danger)";
-        return;
-      }
-
-      if (typeof voucherDatabase !== 'undefined' && voucherDatabase[input]) {
-        activeDiscount = voucherDatabase[input];
-        appliedVoucherCode = input;
-        msg.innerText = `✓ Voucher applied! ${activeDiscount}% OFF discount added.`;
-        msg.style.color = "var(--success)";
-        updateCartUI();
-      } else {
-        activeDiscount = 10;
-        appliedVoucherCode = input;
-        msg.innerText = `✓ Voucher applied! 10% OFF discount added.`;
-        msg.style.color = "var(--success)";
-        updateCartUI();
-      }
-    }
-
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str).replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-      );
-    }
-
-    async function handleCheckout(e) {
-      e.preventDefault();
-
-      if (cart.length === 0) {
-        alert("Your basket is empty!");
-        return;
-      }
-
-      const emailInput = document.getElementById('checkout-email').value.trim();
-      const phoneInput = document.getElementById('checkout-phone').value.trim();
-      const postalInput = document.getElementById('checkout-postal').value.trim();
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(emailInput)) {
-        alert("unknown email");
-        return;
-      }
-
-      if (phoneInput.length !== 9) {
-        alert("❌ Phone number must be exactly 9 digits!");
-        return;
-      }
-
-      if (postalInput.length !== 4) {
-        alert("❌ Postal code must be exactly 4 digits!");
-        return;
-      }
-
-      const checkoutBtn = e.target.querySelector('.checkout-btn');
-      checkoutBtn.disabled = true;
-      checkoutBtn.innerText = "Processing Order...";
-
-      const customerInfo = {
-        country: document.getElementById('checkout-country').value,
-        firstName: document.getElementById('checkout-firstname').value.trim(),
-        lastName: document.getElementById('checkout-lastname').value.trim(),
-        email: emailInput,
-        phone: phoneInput,
-        city: document.getElementById('checkout-city').value,
-        postal: postalInput,
-        address: document.getElementById('checkout-address').value.trim()
-      };
-
-      localStorage.setItem('customerShippingInfo', JSON.stringify(customerInfo));
-
-      if (appliedVoucherCode) {
-        const usedVouchers = JSON.parse(localStorage.getItem('keymatrix_used_vouchers') || '[]');
-        if (!usedVouchers.includes(appliedVoucherCode)) {
-          usedVouchers.push(appliedVoucherCode);
-          localStorage.setItem('keymatrix_used_vouchers', JSON.stringify(usedVouchers));
-        }
-      }
-
-      try {
-        await fetch("https://formspree.io/f/xqervlrw", {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            "Country": customerInfo.country,
-            "Customer Name": `${customerInfo.firstName} ${customerInfo.lastName}`,
-            "Customer Email": customerInfo.email,
-            "Phone Number": customerInfo.phone,
-            "City / Region": customerInfo.city,
-            "Postal Code": customerInfo.postal,
-            "Shipping Address": customerInfo.address,
-            "Items Ordered": cart.map(i => `${i.name} (x${i.qty})`).join(', '),
-            "Discount Applied": `${activeDiscount}%`,
-            "Total Paid": document.getElementById('cart-total').innerText
-          })
-        });
-        alert("Order placed successfully! Thank you for purchasing.");
-      } catch (err) {
-        alert("Order completed successfully!");
-      } finally {
-        cart = [];
-        activeDiscount = 0;
-        appliedVoucherCode = null;
-        document.getElementById('discount-msg').innerText = '';
-        document.getElementById('voucher-input').value = '';
-        updateCartUI();
-        closeCart();
-        checkoutBtn.disabled = false;
-        checkoutBtn.innerText = "Complete Order";
-      }
-    }
-
-    /* REVIEWS AND RATINGS */
     function setRating(val) {
       currentRating = val;
       const stars = document.querySelectorAll('#star-rating span');
       stars.forEach((s, idx) => {
-        if (idx < val) s.classList.add('active');
-        else s.classList.remove('active');
+        if (idx < val) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
       });
     }
 
@@ -1351,27 +1164,25 @@
       const name = document.getElementById('reviewer-name').value.trim();
       const msg = document.getElementById('reviewer-msg').value.trim();
 
-      if (!name || !msg || currentRating === 0) {
-        alert("Please enter your name, pick a star rating, and write a message.");
+      if (!name || !msg) {
+        alert('Please fill in your name and message!');
         return;
       }
-
-      const postBtn = document.getElementById('post-review-btn');
-      postBtn.disabled = true;
-      postBtn.innerText = "Posting...";
+      if (currentRating === 0) {
+        alert('Please select a star rating!');
+        return;
+      }
 
       submitReviewToCloud(name, currentRating, msg);
 
       document.getElementById('reviewer-name').value = '';
       document.getElementById('reviewer-msg').value = '';
       setRating(0);
-      postBtn.disabled = false;
-      postBtn.innerText = "Post Review";
     }
 
-    window.onload = () => {
-      renderProducts();
-    };
+    // Initialize Page
+    renderProducts();
+    loadSavedCustomerData();
   </script>
 </body>
 </html>
