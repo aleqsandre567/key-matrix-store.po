@@ -95,6 +95,22 @@
       100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
+    @keyframes checkBounce {
+      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+      70% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    @keyframes toastSlideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes toastFadeOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
     header {
       background-color: rgba(20, 18, 30, 0.95);
       backdrop-filter: blur(10px);
@@ -141,6 +157,48 @@
       color: var(--primary);
       text-shadow: 0 0 12px var(--glow);
     }
+    /* ==========================================
+   CUSTOM ANIMATED NEON SCROLLBAR FOR KEYMATRIX
+   ========================================== */
+
+/* 1. Track / Base Background */
+::-webkit-scrollbar {
+  width: 10px; /* Sleek, slim width */
+  height: 10px; /* Horizontal scrollbar size if needed */
+}
+
+
+::-webkit-scrollbar-track {
+  background: #09080e; /* Matches body background */
+  border-left: 1px solid #1c182d;
+}
+
+/* 2. Scrollbar Handle / Thumb */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a855f7, #6b21a8); /* Purple gradient */
+  border-radius: 20px; /* Smooth rounded capsule shape */
+  border: 2px solid #09080e; /* Creates padding around thumb */
+  transition: all 0.3s ease-in-out;
+}
+
+/* 3. Hover State (Expands & Glows on Hover) */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #c084fc, #a855f7);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+  cursor: pointer;
+}
+
+/* 4. Active State (When Clicking & Dragging) */
+::-webkit-scrollbar-thumb:active {
+  background: #e9d5ff; /* Bright purple-white glow while dragging */
+  box-shadow: 0 0 18px rgba(192, 132, 252, 1);
+}
+
+/* 5. Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #a855f7 #09080e;
+}
 
     .header-actions {
       display: flex;
@@ -514,6 +572,66 @@
       transform: rotate(90deg) scale(1.1);
     }
 
+    /* DETAILS MODAL SPECS STYLING */
+    .modal-tag {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .modal-specs {
+      background: #09080e;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+    }
+
+    .modal-specs h4 {
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .modal-specs ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .modal-specs li {
+      color: var(--text-gray);
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-specs li::before {
+      content: "⚡";
+      color: var(--primary);
+    }
+
+    .delivery-info {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     /* CART & CHECKOUT ITEMS */
     .cart-item {
       display: flex;
@@ -572,37 +690,58 @@
       transform: scale(1.05);
     }
 
-    .form-group { margin-bottom: 15px; }
+    /* HUMAN-MODE OPTIMIZED FORM STYLING */
+    .form-group { 
+      margin-bottom: 16px; 
+    }
 
     .form-group label {
       display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      color: var(--text-gray);
+      margin-bottom: 7px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.2px;
     }
 
     .form-group input, .form-group textarea, .form-group select {
       width: 100%;
-      padding: 12px;
-      background: #09080e;
+      padding: 12px 14px;
+      background: #0d0c14;
       border: 1px solid var(--border-color);
       color: white;
-      border-radius: 8px;
+      border-radius: 9px;
       outline: none;
-      transition: all 0.3s ease;
+      font-size: 14px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-group select option {
+      background: #14121e;
+      color: white;
     }
 
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 10px var(--glow);
-      transform: translateY(-1px);
+      box-shadow: 0 0 12px var(--glow);
+      background: #12101c;
     }
 
     .form-row {
       display: flex;
-      gap: 15px;
+      gap: 14px;
     }
-    .form-row .form-group { flex: 1; }
+    .form-row .form-group { 
+      flex: 1; 
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
 
     .voucher-box {
       display: flex;
@@ -771,9 +910,72 @@
       display: inline-block;
       flex-shrink: 0;
     }
+
+    /* 🚀 CUSTOM MODERN TOAST & SUCCESS MODAL STYLES */
+    .toast-container {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast-card {
+      pointer-events: auto;
+      min-width: 280px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px var(--glow);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      animation: toastSlideIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .toast-card.warning {
+      border-left-color: #f59e0b;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+
+    .toast-card.danger {
+      border-left-color: var(--danger);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .toast-card.hide {
+      animation: toastFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .success-icon-animated {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 15px auto;
+      background: rgba(16, 185, 129, 0.15);
+      border: 2px solid var(--success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: var(--success);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+      animation: checkBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
   </style>
 </head>
 <body>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
 
   <!-- HEADER -->
   <header>
@@ -892,12 +1094,17 @@
         <p class="warning-text">⚠️ ყურადღება: სანამ გადამხდელისა და მიმღების სახელები არ დაემთხვევა ერთმანეთს, პროდუქტი არ გაიგზავნება!</p>
       </div>
 
-      <form id="checkout-form" onsubmit="handleCheckout(event)">
-        <h3 style="margin-bottom: 15px;">Shipping Details</h3>
+      <!-- FORMSPREE INTEGRATION FOR ORDERS -->
+      <form id="checkout-form" action="https://formspree.io/f/YOUR_FORMSPREE_ID_HERE" method="POST" onsubmit="handleCheckout(event)">
+        <h3 style="margin-bottom: 18px; color: var(--text-white); font-size: 18px;">Shipping Details</h3>
+
+        <!-- Hidden input to carry full cart details to Formspree -->
+        <input type="hidden" name="Order_Details" id="formspree-cart-details">
+        <input type="hidden" name="Total_Price" id="formspree-total-price">
         
         <div class="form-group">
           <label>Country / ქვეყანა</label>
-          <select id="checkout-country" required>
+          <select id="checkout-country" name="Country" required>
             <option value="Georgia (საქართველო)" selected>Georgia (საქართველო)</option>
           </select>
         </div>
@@ -905,52 +1112,61 @@
         <div class="form-row">
           <div class="form-group">
             <label>First Name / სახელი</label>
-            <input type="text" id="checkout-firstname" required placeholder="Giorgi">
+            <input type="text" id="checkout-firstname" name="First_Name" required placeholder="Giorgi">
           </div>
           <div class="form-group">
             <label>Last Name / გვარი</label>
-            <input type="text" id="checkout-lastname" required placeholder="Beridze">
+            <input type="text" id="checkout-lastname" name="Last_Name" required placeholder="Beridze">
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Email Address / ელ-ფოსტა</label>
-            <input type="email" id="checkout-email" required placeholder="giorgi@example.com">
-          </div>
-          <div class="form-group">
-            <label>Phone Number / ტელეფონი (9 digits)</label>
-            <input 
-              type="text" 
-              inputmode="numeric" 
-              pattern="[0-9]{9}"
-              maxlength="9"
-              id="checkout-phone" 
-              required 
-              placeholder="599123456" 
-              oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);"
-            >
-          </div>
+        <!-- EMAIL FIELD -->
+        <div class="form-group">
+          <label>Email Address / ელ-ფოსტა</label>
+          <input type="email" id="checkout-email" name="Email" required placeholder="giorgi@example.com">
         </div>
 
+        <!-- PHONE NUMBER FIELD -->
+        <div class="form-group">
+          <label>Phone Number / ტელეფონი (9 digits)</label>
+          <input 
+            type="text" 
+            inputmode="numeric" 
+            pattern="[0-9]{9}"
+            maxlength="9"
+            id="checkout-phone" 
+            name="Phone"
+            required 
+            placeholder="599123456" 
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);"
+          >
+        </div>
+
+        <!-- CITY / REGION & POSTAL CODE -->
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group" style="flex: 2;">
             <label>City / Region (ქალაქი / რეგიონი)</label>
-            <select id="checkout-city" required>
+            <select id="checkout-city" name="City" required>
               <option value="" disabled selected>აირჩიეთ ქალაქი / სოფელი</option>
               <option value="Tbilisi (თბილისი)">Tbilisi (თბილისი)</option>
               <option value="Batumi (ბათუმი)">Batumi (ბათუმი)</option>
+              <option value="Kutaisi (ქუთაისი)">Kutaisi (ქუთაისი)</option>
+              <option value="Rustavi (რუსთავი)">Rustavi (რუსთავი)</option>
+              <option value="Gori (გორი)">Gori (გორი)</option>
+              <option value="Poti (ფოთი)">Poti (ფოთი)</option>
+              <option value="Zugdidi (ზუგდიდი)">Zugdidi (ზუგდიდი)</option>
               <option value="Villages / Region (სოფლები / რეგიონები)">Villages / Region (სოფლები / რეგიონები)</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Postal Code / ინდექსი (4 digits)</label>
+          <div class="form-group" style="flex: 1;">
+            <label>Postal Code / ინდექსი</label>
             <input 
               type="text" 
               inputmode="numeric" 
               pattern="[0-9]{4}" 
               maxlength="4"
               id="checkout-postal" 
+              name="Postal_Code"
               required 
               placeholder="0101" 
               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);"
@@ -960,17 +1176,26 @@
 
         <div class="form-group">
           <label>Address / მისამართი (ქუჩა, ბინა, სოფლის სახელი)</label>
-          <textarea id="checkout-address" rows="2" required placeholder="მაგ: რუსთაველის გამზ. 12 ან სოფელი მუხრანი"></textarea>
+          <textarea id="checkout-address" name="Address" rows="2" required placeholder="მაგ: რუსთაველის გამზ. 12 ან სოფელი მუხრანი"></textarea>
         </div>
 
-        <button type="submit" class="checkout-btn">Complete Order</button>
+        <button type="submit" class="checkout-btn" id="submit-order-btn">Complete Order</button>
       </form>
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <!-- 🎉 CUSTOM ORDER SUCCESS ANIMATED MODAL -->
+  <div class="modal" id="success-modal">
+    <div class="modal-content" style="text-align: center; max-width: 480px;">
+      <div class="success-icon-animated">✓</div>
+      <h2 style="color: var(--text-white); font-size: 24px; margin-bottom: 8px;">შეკვეთა მიღებულია!</h2>
+      <p style="color: var(--accent); font-weight: 700; font-size: 16px; margin-bottom: 12px;">Order Placed Successfully</p>
+      <p style="color: var(--text-gray); font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+        გმადლობთ KeyMatrix-ის არჩევისთვის! თქვენი შეკვეთა წარმატებით დარეგისტრირდა. ჩვენი გუნდი მალე დაგიკავშირდებათ მითითებულ ნომერზე.
+      </p>
+      <button class="checkout-btn" onclick="closeSuccessModal()" style="padding: 12px 30px;">Great, Thanks!</button>
+    </div>
+  </div>
 
   <script>
     // 1. Connect to Firebase
@@ -1001,7 +1226,6 @@
       if (!reviewsContainer) return;
       reviewsContainer.innerHTML = '';
 
-      // Generates precise SVG stars (supports half-stars like 4.5)
       const getStarsSVG = (rating = 5) => {
         const numRating = parseFloat(rating) || 0;
         let starsHTML = '';
@@ -1037,46 +1261,84 @@
           const card = document.createElement('div');
           card.className = 'review-card';
           card.innerHTML = `
-            <h4>${rev.name || 'Anonymous'} - ${getStarsSVG(rev.rating)}</h4>
-            <p>${rev.comment || rev.message || ''}</p>
+            <h4>${escapeHTML(rev.name || 'Anonymous')} ${getStarsSVG(rev.rating)}</h4>
+            <p>${escapeHTML(rev.comment || rev.message || '')}</p>
           `;
           reviewsContainer.prepend(card);
         });
+      } else {
+        reviewsContainer.innerHTML = '<p style="color: var(--text-gray);">No reviews yet. Be the first!</p>';
       }
     });
   </script>
 
-  <!-- MAIN SCRIPT -->
+  <!-- MAIN SHOP INTERACTION SCRIPT -->
   <script>
     let products = typeof defaultProducts !== 'undefined' ? defaultProducts : [
-      { id: 1, name: "AttackShark L80PRO", category: "headset", price: 139.00, oldPrice: 239.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AttackShark+L80PRO", desc: "Professional wireless gaming headset with crystal clear audio mic." },
-      { id: 2, name: "Ajazz AK820", category: "keyboard", price: 229.00, oldPrice: 299.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Ajazz+AK820", desc: "Custom mechanical keyboard with premium switches and knobs." },
-      { id: 3, name: "Aula F75", category: "keyboard", price: 149.00, oldPrice: 199.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Aula+F75", desc: "Compact gasket mechanical gaming keyboard." },
-      { id: 4, name: "AULA SC620", category: "mouse", price: 99.00, oldPrice: 139.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AULA+SC620", desc: "Ultra-lightweight high precision RGB gaming mouse." }
+      { 
+        id: 1, 
+        name: "AttackShark L80PRO", 
+        category: "headset", 
+        price: 139.00, 
+        oldPrice: 239.00, 
+        image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AttackShark+L80PRO", 
+        desc: "Professional wireless gaming headset with ultra-clear microphone and spatial audio.",
+        specs: ["Connectivity: 2.4GHz Wireless + Bluetooth 5.3", "Battery Life: Up to 40 hours continuous play", "Drivers: 50mm Neodymium Pro Speakers", "Noise Cancellation: Detachable HD Mic with AI Noise Filter"]
+      },
+      { 
+        id: 2, 
+        name: "Ajazz AK820", 
+        category: "keyboard", 
+        price: 229.00, 
+        oldPrice: 299.00, 
+        image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Ajazz+AK820", 
+        desc: "Custom mechanical keyboard with hot-swappable switches, volume knob, and dynamic RGB lighting.",
+        specs: ["Layout: 75% Compact (82 Keys + Multi-function Knob)", "Switches: Factory Lubed Custom Linear Switches", "Keycaps: PBT Double-shot anti-shine profile", "Hot-Swappable: 3-pin & 5-pin PCB support"]
+      },
+      { 
+        id: 3, 
+        name: "Aula F75", 
+        category: "keyboard", 
+        price: 149.00, 
+        oldPrice: 199.00, 
+        image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Aula+F75", 
+        desc: "Gasket-mounted mechanical gaming keyboard engineered for silky quiet acoustics and tactile response.",
+        specs: ["Structure: 5-Layer Sound Dampening Gasket Mount", "Connectivity: Tri-Mode (2.4G / BT / Type-C Wire)", "RGB: South-facing LEDs with 16.8 million colors", "Battery: 4000mAh High Capacity"]
+      },
+      { 
+        id: 4, 
+        name: "AULA SC620", 
+        category: "mouse", 
+        price: 99.00, 
+        oldPrice: 139.00, 
+        image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AULA+SC620", 
+        desc: "Ultra-lightweight high precision RGB gaming mouse designed for competitive esports.",
+        specs: ["Sensor: PAW3395 Optical Sensor (Up to 26,000 DPI)", "Weight: Featherlight 56 grams", "Polling Rate: 1000Hz Ultra-fast Response", "Switches: 80 Million Clicks Micro-switches"]
+      }
     ];
 
     let cart = [];
     let activeDiscount = 0;
-    let appliedVoucherCode = null;
     let currentRating = 0;
     let currentCategory = 'all';
     let currency = 'GEL';
 
-    function escapeHTML(str) {
-      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    /* TOAST NOTIFICATION HELPER (NO NATIVE ALERTS) */
+    function showToast(message, type = 'normal', icon = '⚡') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast-card ${type}`;
+      toast.innerHTML = `<span>${icon}</span> <span>${escapeHTML(message)}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 350);
+      }, 3500);
     }
 
-    function loadSavedCustomerData() {
-      const savedInfo = JSON.parse(localStorage.getItem('customerShippingInfo'));
-      if (savedInfo) {
-        if (savedInfo.firstName) document.getElementById('checkout-firstname').value = savedInfo.firstName;
-        if (savedInfo.lastName) document.getElementById('checkout-lastname').value = savedInfo.lastName;
-        if (savedInfo.email) document.getElementById('checkout-email').value = savedInfo.email;
-        if (savedInfo.phone) document.getElementById('checkout-phone').value = savedInfo.phone;
-        if (savedInfo.city) document.getElementById('checkout-city').value = savedInfo.city;
-        if (savedInfo.postal) document.getElementById('checkout-postal').value = savedInfo.postal;
-        if (savedInfo.address) document.getElementById('checkout-address').value = savedInfo.address;
-      }
+    function escapeHTML(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
     function formatPrice(amount) {
@@ -1090,13 +1352,14 @@
     function toggleCurrency() {
       currency = currency === 'GEL' ? 'USD' : 'GEL';
       document.getElementById('currency-btn').innerText = currency === 'GEL' ? 'GEL (₾)' : 'USD ($)';
-      renderProducts(currentCategory);
+      renderProducts(currentCategory, document.getElementById('search-input').value);
       updateCartUI();
     }
 
     function renderProducts(category = 'all', searchQuery = '') {
       currentCategory = category;
       const container = document.getElementById('products-container');
+      if (!container) return;
       container.innerHTML = '';
 
       let filtered = category === 'all' ? products : products.filter(p => p.category === category);
@@ -1110,27 +1373,26 @@
         return;
       }
 
-      filtered.forEach((p, index) => {
+      filtered.forEach((p) => {
         const hasSale = p.oldPrice && p.oldPrice > p.price;
         const oldPriceHtml = hasSale ? `<span class="old-price">${formatPrice(p.oldPrice)}</span>` : '';
         const badgeHtml = hasSale ? `<span class="badge">SALE</span>` : '';
 
         const card = document.createElement('div');
         card.className = 'product-card';
-        card.style.animationDelay = `${index * 0.08}s`;
         card.innerHTML = `
           ${badgeHtml}
           <div class="product-img" onclick="openDetailsModal(${p.id})">
-            <img src="${p.image}" alt="${escapeHTML(p.name)}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=KeyMatrix+Gear';">
+            <img src="${p.image}" alt="${escapeHTML(p.name)}" onerror="this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=KeyMatrix';">
           </div>
           <div class="product-title" onclick="openDetailsModal(${p.id})">${escapeHTML(p.name)}</div>
           <div class="price-container">
-            <div class="product-price">${formatPrice(p.price)}</div>
+            <span class="product-price">${formatPrice(p.price)}</span>
             ${oldPriceHtml}
           </div>
           <div class="card-actions">
-            <button class="add-btn" onclick="addToCart(${p.id})">კალათაში</button>
-            <button class="info-btn" onclick="openDetailsModal(${p.id})">👁️</button>
+            <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+            <button class="info-btn" onclick="openDetailsModal(${p.id})">ℹ</button>
           </div>
         `;
         container.appendChild(card);
@@ -1138,21 +1400,162 @@
     }
 
     function handleSearch() {
-      const query = document.getElementById('search-input').value;
-      renderProducts(currentCategory, query);
+      const q = document.getElementById('search-input').value;
+      renderProducts(currentCategory, q);
     }
 
-    function filterCategory(cat, btn) {
+    function filterCategory(cat, btnElem) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (btnElem) btnElem.classList.add('active');
       renderProducts(cat, document.getElementById('search-input').value);
     }
 
-    function setRating(val) {
-      currentRating = val;
+    function addToCart(id) {
+      const p = products.find(prod => prod.id === id);
+      if (!p) return;
+      
+      const item = cart.find(c => c.id === id);
+      if (item) {
+        item.qty++;
+      } else {
+        cart.push({ ...p, qty: 1 });
+      }
+      showToast(`${p.name} added to cart!`, 'normal', '🛒');
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const cartCount = document.getElementById('cart-count');
+      const cartItems = document.getElementById('cart-items');
+      const cartTotal = document.getElementById('cart-total');
+
+      const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+      cartCount.innerText = totalItems;
+
+      if (!cartItems) return;
+      cartItems.innerHTML = '';
+
+      let rawTotal = 0;
+      cart.forEach(item => {
+        rawTotal += item.price * item.qty;
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div class="cart-item-info">
+            <strong>${escapeHTML(item.name)}</strong>
+            <div style="color: var(--accent); font-size: 14px;">${formatPrice(item.price)}</div>
+          </div>
+          <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">✕</button>
+          </div>
+        `;
+        cartItems.appendChild(row);
+      });
+
+      const finalTotal = rawTotal * (1 - activeDiscount);
+      cartTotal.innerText = `Total: ${formatPrice(finalTotal)}`;
+
+      // Update hidden inputs for Formspree
+      const orderSummary = cart.map(i => `${i.name} (x${i.qty}) - ${formatPrice(i.price * i.qty)}`).join(' | ');
+      document.getElementById('formspree-cart-details').value = orderSummary || 'No Items';
+      document.getElementById('formspree-total-price').value = formatPrice(finalTotal);
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(c => c.id === id);
+      if (item) {
+        item.qty += delta;
+        if (item.qty <= 0) {
+          removeFromCart(id);
+        } else {
+          updateCartUI();
+        }
+      }
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(c => c.id !== id);
+      updateCartUI();
+    }
+
+    function openCart() {
+      document.getElementById('cart-modal').classList.add('show');
+    }
+
+    function closeCart() {
+      document.getElementById('cart-modal').classList.remove('show');
+    }
+
+    function applyVoucher() {
+      const code = document.getElementById('voucher-input').value.trim().toUpperCase();
+      const msg = document.getElementById('discount-msg');
+      if (code === 'KEYMATRIX10') {
+        activeDiscount = 0.10;
+        msg.innerText = "10% Discount Applied!";
+        showToast("10% Discount Code Applied!", "normal", "🎉");
+      } else {
+        msg.innerText = "Invalid Voucher Code";
+        msg.style.color = "var(--danger)";
+        showToast("Invalid discount voucher code", "warning", "⚠️");
+      }
+      updateCartUI();
+    }
+
+    /* CUSTOM CHECKOUT HANDLER WITH ANIMATED MODALS */
+    async function handleCheckout(e) {
+      e.preventDefault();
+      if (cart.length === 0) {
+        showToast("Your cart is empty! Add products first.", "warning", "⚠️");
+        return;
+      }
+
+      const form = e.target;
+      const submitBtn = document.getElementById('submit-order-btn');
+      submitBtn.innerText = "Processing Order...";
+      submitBtn.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: new FormData(form),
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          cart = [];
+          updateCartUI();
+          closeCart();
+          form.reset();
+          openSuccessModal();
+        } else {
+          showToast("Order submit failed. Please verify Formspree settings.", "danger", "❌");
+        }
+      } catch (error) {
+        showToast("Network error submitting order. Try again.", "danger", "🌐");
+      } finally {
+        submitBtn.innerText = "Complete Order";
+        submitBtn.disabled = false;
+      }
+    }
+
+    function openSuccessModal() {
+      document.getElementById('success-modal').classList.add('show');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('success-modal').classList.remove('show');
+    }
+
+    function setRating(r) {
+      currentRating = r;
       const stars = document.querySelectorAll('#star-rating span');
       stars.forEach((s, idx) => {
-        if (idx < val) {
+        if (idx < r) {
           s.classList.add('active');
         } else {
           s.classList.remove('active');
@@ -1165,24 +1568,59 @@
       const msg = document.getElementById('reviewer-msg').value.trim();
 
       if (!name || !msg) {
-        alert('Please fill in your name and message!');
+        showToast("Please enter your name and review message!", "warning", "✍️");
         return;
       }
+
       if (currentRating === 0) {
-        alert('Please select a star rating!');
+        showToast("Please select a star rating!", "warning", "⭐");
         return;
       }
 
       submitReviewToCloud(name, currentRating, msg);
-
       document.getElementById('reviewer-name').value = '';
       document.getElementById('reviewer-msg').value = '';
       setRating(0);
+      showToast("Review submitted successfully!", "normal", "💬");
     }
 
-    // Initialize Page
-    renderProducts();
-    loadSavedCustomerData();
+    /* ENHANCED DETAILS MODAL */
+    function openDetailsModal(id) {
+      const p = products.find(prod => prod.id === id);
+      if (!p) return;
+
+      const specsList = p.specs ? p.specs.map(s => `<li>${escapeHTML(s)}</li>`).join('') : '<li>Official KeyMatrix Quality Guaranteed</li>';
+
+      document.getElementById('modal-product-title').innerText = p.name;
+      document.getElementById('modal-product-body').innerHTML = `
+        <span class="modal-tag">${escapeHTML(p.category)}</span>
+        <img src="${p.image}" style="width: 100%; border-radius: 10px; margin-bottom: 15px;" onerror="this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=KeyMatrix';">
+        
+        <p style="color: var(--text-gray); margin-bottom: 15px; font-size: 14px; line-height: 1.5;">${escapeHTML(p.desc)}</p>
+        
+        <div class="modal-specs">
+          <h4>Technical Specifications:</h4>
+          <ul>${specsList}</ul>
+        </div>
+
+        <div class="delivery-info">
+          🚚 <strong>Express Delivery:</strong> 2-3 business days anywhere in Georgia.
+        </div>
+
+        <h3 style="color: var(--accent); font-size: 22px; margin-bottom: 20px;">${formatPrice(p.price)}</h3>
+        <button class="add-btn" style="width: 100%; padding: 12px;" onclick="addToCart(${p.id}); closeDetailsModal();">Add to Cart</button>
+      `;
+      document.getElementById('details-modal').classList.add('show');
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('details-modal').classList.remove('show');
+    }
+
+    // Initialize shop layout on launch
+    window.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+    });
   </script>
 </body>
 </html>
