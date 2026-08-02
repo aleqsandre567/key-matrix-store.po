@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KeyMatrix | Gaming Gear Store</title>
+  <title>KeyMatrix | Premium Gaming Tech & Accessories</title>
   
   <!-- DATABASE SCRIPT -->
   <script src="database.js"></script>
 
-  <!-- FIREBASE REALTIME DATABASE SDKs FOR LIVE REVIEWS -->
+  <!-- FIREBASE REALTIME DATABASE SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <style>
-    /* --- DARK NEON THEME STYLES --- */
     :root {
       --bg-color: #09080e;
       --card-bg: #14121e;
@@ -23,7 +22,6 @@
       --text-white: #ffffff;
       --text-gray: #9ca3af;
       --danger: #ef4444;
-      --danger-hover: #dc2626;
       --success: #10b981;
       --border-color: #262338;
       --glow: rgba(168, 85, 247, 0.35);
@@ -40,13 +38,51 @@
       background-color: var(--bg-color);
       color: var(--text-white);
       padding-bottom: 60px;
+      animation: fadeInPage 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-x: hidden;
+    }
+
+    /* KEYFRAME ANIMATIONS */
+    @keyframes fadeInPage {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 15px var(--glow); }
+      50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.6); }
+      100% { box-shadow: 0 0 15px var(--glow); }
+    }
+
+    @keyframes badgePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes cardAppear {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes floatHero {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+      100% { transform: translateY(0px); }
+    }
+
+    @keyframes modalSpring {
+      0% { transform: scale(0.7) translateY(-30px); opacity: 0; }
+      70% { transform: scale(1.02) translateY(5px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
     header {
-      background-color: var(--card-bg);
+      background-color: rgba(20, 18, 30, 0.95);
+      backdrop-filter: blur(10px);
       border-bottom: 2px solid var(--primary);
       box-shadow: 0 4px 20px var(--glow);
-      padding: 15px 40px;
+      padding: 12px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -55,18 +91,37 @@
       z-index: 100;
       flex-wrap: wrap;
       gap: 15px;
+      transition: all 0.3s ease;
     }
 
     .logo {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       letter-spacing: 2px;
       color: var(--text-white);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.04);
+    }
+
+    .logo-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 12px var(--glow);
     }
 
     .logo span {
       color: var(--primary);
-      text-shadow: 0 0 10px var(--glow);
+      text-shadow: 0 0 12px var(--glow);
     }
 
     .header-actions {
@@ -79,10 +134,16 @@
       background: #1b1928;
       border: 1px solid var(--border-color);
       color: var(--accent);
-      padding: 8px 12px;
+      padding: 8px 14px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    .currency-toggle:hover { 
+      border-color: var(--primary); 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--glow);
     }
 
     .cart-btn {
@@ -94,13 +155,17 @@
       cursor: pointer;
       font-weight: bold;
       transition: all 0.3s ease;
-      box-shadow: 0 0 15px var(--glow);
+      animation: pulseGlow 3s infinite;
       position: relative;
     }
 
     .cart-btn:hover {
       background: var(--primary-hover);
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .cart-btn:active {
+      transform: translateY(0) scale(0.98);
     }
 
     .cart-count {
@@ -113,12 +178,67 @@
       padding: 2px 8px;
       font-size: 12px;
       font-weight: bold;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .container {
       max-width: 1200px;
       margin: 30px auto;
       padding: 0 20px;
+    }
+
+    /* HERO BANNER */
+    .hero-banner {
+      background: linear-gradient(135deg, #14121e 0%, #1f1b32 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 35px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      animation: floatHero 6s ease-in-out infinite;
+    }
+
+    .hero-banner h1 {
+      font-size: 32px;
+      color: var(--text-white);
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px var(--glow);
+    }
+
+    .hero-banner p {
+      color: var(--text-gray);
+      font-size: 16px;
+    }
+
+    /* PARTNERS BAR */
+    .partners-section {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .partner-logo {
+      font-weight: 700;
+      color: var(--text-gray);
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .partner-logo:hover { 
+      color: var(--accent); 
+      transform: scale(1.1);
+      text-shadow: 0 0 12px var(--glow); 
     }
 
     /* SEARCH & FILTER BAR */
@@ -146,10 +266,13 @@
       border-radius: 8px;
       color: white;
       outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .search-box input:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 12px var(--glow);
+      transform: translateY(-1px);
     }
 
     .tabs {
@@ -167,22 +290,23 @@
       padding: 8px 18px;
       cursor: pointer;
       border-radius: 8px;
-      transition: 0.3s;
+      transition: all 0.3s ease;
     }
 
     .tab-btn:hover {
       color: var(--text-white);
       background: var(--border-color);
+      transform: translateY(-2px);
     }
 
     .tab-btn.active {
       color: var(--text-white);
       background: var(--card-bg);
       border-color: var(--primary);
-      box-shadow: 0 0 10px var(--glow);
+      box-shadow: 0 0 12px var(--glow);
     }
 
-    /* PRODUCT CARDS */
+    /* PRODUCT CARDS GRID */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
@@ -197,14 +321,15 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
       position: relative;
+      animation: cardAppear 0.5s ease forwards;
     }
 
     .product-card:hover {
-      transform: translateY(-6px);
+      transform: translateY(-8px) scale(1.015);
       border-color: var(--primary);
-      box-shadow: 0 8px 25px var(--glow);
+      box-shadow: 0 15px 35px var(--glow);
     }
 
     .badge {
@@ -219,6 +344,7 @@
       border-radius: 6px;
       text-transform: uppercase;
       z-index: 2;
+      animation: badgePulse 2s infinite ease-in-out;
     }
 
     .product-img {
@@ -236,11 +362,11 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: 0.3s;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .product-card:hover .product-img img {
-      transform: scale(1.05);
+      transform: scale(1.1) rotate(1deg);
     }
 
     .product-title {
@@ -248,6 +374,7 @@
       font-weight: 700;
       margin-bottom: 8px;
       cursor: pointer;
+      transition: color 0.2s ease;
     }
 
     .product-title:hover {
@@ -287,11 +414,17 @@
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.25s ease;
     }
 
     .add-btn:hover {
       background: var(--primary-hover);
+      box-shadow: 0 0 12px var(--glow);
+      transform: translateY(-2px);
+    }
+
+    .add-btn:active {
+      transform: translateY(0);
     }
 
     .info-btn {
@@ -301,18 +434,31 @@
       padding: 10px;
       border-radius: 8px;
       cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    
+    .info-btn:hover { 
+      background: var(--primary); 
+      transform: translateY(-2px);
     }
 
-    /* MODAL GENERAL */
+    /* MODAL WINDOWS */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(8px);
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      opacity: 1;
     }
 
     .modal-content {
@@ -324,7 +470,8 @@
       padding: 30px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 0 30px var(--glow);
+      box-shadow: 0 0 40px var(--glow);
+      animation: modalSpring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
 
     .modal-header {
@@ -342,9 +489,14 @@
       color: white;
       font-size: 24px;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .close-btn:hover { 
+      color: var(--primary); 
+      transform: rotate(90deg) scale(1.1);
     }
 
-    /* BASKET ITEMS */
+    /* CART & CHECKOUT ITEMS */
     .cart-item {
       display: flex;
       justify-content: space-between;
@@ -353,6 +505,7 @@
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 12px;
       gap: 10px;
+      animation: cardAppear 0.3s ease forwards;
     }
 
     .cart-item-info { flex: 1; }
@@ -376,6 +529,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .qty-btn:hover {
+      background: var(--primary);
+      transform: scale(1.1);
     }
 
     .remove-btn {
@@ -387,6 +546,12 @@
       cursor: pointer;
       font-size: 12px;
       font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      filter: brightness(1.2);
+      transform: scale(1.05);
     }
 
     .form-group { margin-bottom: 15px; }
@@ -406,20 +571,20 @@
       color: white;
       border-radius: 8px;
       outline: none;
+      transition: all 0.3s ease;
     }
 
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 10px var(--glow);
+      transform: translateY(-1px);
     }
 
     .form-row {
       display: flex;
       gap: 15px;
     }
-
-    .form-row .form-group {
-      flex: 1;
-    }
+    .form-row .form-group { flex: 1; }
 
     .voucher-box {
       display: flex;
@@ -445,6 +610,12 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .voucher-btn:hover {
+      background: var(--primary);
+      transform: translateY(-2px);
     }
 
     .discount-text {
@@ -460,6 +631,7 @@
       border-radius: 10px;
       padding: 15px;
       margin: 20px 0;
+      box-shadow: inset 0 0 15px rgba(168, 85, 247, 0.1);
     }
 
     .bank-transfer-box h4 {
@@ -499,32 +671,49 @@
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
-    /* COMMUNITY CHAT & REVIEWS SECTION */
+    .checkout-btn:hover { 
+      filter: brightness(1.15); 
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); 
+      transform: translateY(-2px);
+    }
+
+    /* COMMUNITY REVIEWS SECTION */
     .section-box {
       margin-top: 50px;
       background: var(--card-bg);
       padding: 30px;
       border-radius: 16px;
       border: 1px solid var(--border-color);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
 
     .rating-stars span {
-      font-size: 28px;
+      font-size: 32px;
       cursor: pointer;
       color: var(--text-gray);
       user-select: none;
+      display: inline-block;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease;
     }
 
-    .rating-stars span.active { color: #f59e0b; }
+    .rating-stars span:hover { 
+      transform: scale(1.35) rotate(-5deg); 
+    }
+
+    .rating-stars span.active { 
+      color: #f59e0b; 
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.6); 
+    }
 
     .review-chat-box {
       max-height: 400px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       margin-top: 20px;
       padding-right: 8px;
     }
@@ -533,7 +722,13 @@
       background: #1b1928;
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 16px 20px;
+      animation: cardAppear 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+      transition: border-color 0.3s ease;
+    }
+
+    .review-bubble:hover {
+      border-color: var(--accent);
     }
 
     .review-header {
@@ -542,15 +737,35 @@
       align-items: center;
       margin-bottom: 6px;
     }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;                  /* Size of the background logo */
+      height: 700px;
+      background-image: url('images/logo.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0.06;                 /* Controls transparency (0.05 - 0.15 works best) */
+      pointer-events: none;          /* Allows clicking through to buttons underneath */
+      z-index: -1;                   /* Keeps it strictly behind all content */
+    }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
-  <header>
-    <div class="logo">KEY<span>MATRIX</span></div>
+   <header>
+    <div class="logo">
+      <!-- High Quality KeyMatrix Logo Image -->
+      <img src="images/logo.png" alt="KEYMATRIX Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/45/a855f7/ffffff?text=KM';">
+      KEY<span>MATRIX</span>
+    </div>
     <div class="header-actions">
-      <button class="currency-toggle" onclick="toggleCurrency()" id="currency-btn">USD ($)</button>
+      <button class="currency-toggle" onclick="toggleCurrency()" id="currency-btn">GEL (₾)</button>
       <button class="cart-btn" onclick="openCart()">
         🛒 Basket <span class="cart-count" id="cart-count">0</span>
       </button>
@@ -560,6 +775,20 @@
   <!-- MAIN CONTAINER -->
   <div class="container">
     
+    <!-- HERO BANNER -->
+    <div class="hero-banner">
+      <h1>მაღალი ხარისხის ტექნიკა გელოდებათ აქ!</h1>
+      <p>Discover professional mechanical keyboards, gaming mouses, audio gear, and elite accessories.</p>
+    </div>
+
+    <!-- PARTNERS SECTION -->
+    <div class="partners-section">
+      <div class="partner-logo">ATTACK SHARK</div>
+      <div class="partner-logo">AULA</div>
+      <div class="partner-logo">AJAZZ</div>
+      <div class="partner-logo">KEYMATRIX PRO</div>
+    </div>
+
     <!-- SEARCH & CATEGORY FILTERS -->
     <div class="filter-section">
       <div class="search-box">
@@ -578,13 +807,13 @@
     <!-- PRODUCTS GRID -->
     <div class="products-grid" id="products-container"></div>
 
-    <!-- GLOBAL PUBLIC MESSAGING & REVIEWS -->
+    <!-- GLOBAL PUBLIC REVIEWS & RATINGS -->
     <div class="section-box">
-      <h2>💬 Public Community Reviews</h2>
-      <p style="color: var(--text-gray); margin-top: 5px; font-size: 14px;">Leave a public review or feedback visible to everyone in real-time!</p>
+      <h2>💬 Customer Reviews & Feedback</h2>
+      <p style="color: var(--text-gray); margin-top: 5px; font-size: 14px;">Leave your public review with a star rating below!</p>
       
       <div style="margin: 15px 0;">
-        <label style="color: var(--text-gray);">Rating: </label>
+        <label style="color: var(--text-gray);">Select Rating: </label>
         <div class="rating-stars" id="star-rating">
           <span onclick="setRating(1)">★</span>
           <span onclick="setRating(2)">★</span>
@@ -601,9 +830,9 @@
       </div>
       <button class="add-btn" id="post-review-btn" style="width: auto; padding: 10px 25px;" onclick="submitReview()">Post Review</button>
 
-      <h3 style="margin-top: 35px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Live Community Messages</h3>
+      <h3 style="margin-top: 35px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Community Feed</h3>
       <div class="review-chat-box" id="reviews-container">
-        <p style="color: var(--text-gray);">Loading customer reviews...</p>
+        <p style="color: var(--text-gray);">Loading reviews...</p>
       </div>
     </div>
   </div>
@@ -630,12 +859,12 @@
       <div id="cart-items"></div>
 
       <div class="voucher-box">
-        <input type="text" id="voucher-input" placeholder="VOUCHER CODE">
+        <input type="text" id="voucher-input" placeholder="VOUCHER CODE (1-time use)">
         <button type="button" class="voucher-btn" onclick="applyVoucher()">Apply</button>
       </div>
       <div class="discount-text" id="discount-msg"></div>
 
-      <h3 id="cart-total" style="text-align: right; color: var(--accent); margin: 15px 0;">Total: $0.00</h3>
+      <h3 id="cart-total" style="text-align: right; color: var(--accent); margin: 15px 0;">Total: 0.00 GEL</h3>
 
       <!-- 💳 BANK TRANSFER INFO -->
       <div class="bank-transfer-box">
@@ -724,7 +953,7 @@
 
   <!-- MAIN SCRIPT -->
   <script>
-    // 1. FIREBASE REALTIME DATABASE CONFIGURATION
+    // 1. FIREBASE CONFIGURATION
     const firebaseConfig = {
       databaseURL: "https://keymatrix-store-default-rtdb.firebaseio.com"
     };
@@ -736,28 +965,28 @@
       }
       db = firebase.database();
     } catch (e) {
-      console.warn("Firebase not connected. Defaulting to local reviews.");
+      console.warn("Firebase initialized via fallback storage mode.");
     }
 
-    // FIXED REVIEWS (Default static reviews)
     const fixedReviews = [
       { name: "Saba G.", rating: 5, message: "ძალიან სწრაფი მიწოდება იყო! კლავიატურა იდეალურ მდგომარეობაში ჩამოვიდა." },
-      { name: "Nika_Gamer", rating: 5, message: "Matrix Viper mouse is insane for CS2. Best store in Georgia!" },
+      { name: "Nika_Gamer", rating: 5, message: "AttackShark and Aula gear here is top tier. Best store!" },
       { name: "Luka", rating: 4, message: "კარგი ხარისხის მაუსპადი, ძალიან რბილია და ხელი არ მეღლება." }
     ];
 
-    // 2. STORE GLOBAL STATE
     let products = typeof defaultProducts !== 'undefined' ? defaultProducts : [
-      { id: 1, name: "KeyMatrix Pro 60%", category: "keyboard", price: 79.99, oldPrice: 99.99, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=60%25+Keyboard", desc: "Mechanical gaming keyboard with hot-swappable switches and RGB." },
-      { id: 2, name: "Matrix Viper Ultra Mouse", category: "mouse", price: 49.99, oldPrice: 59.99, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Gaming+Mouse", desc: "Ultra lightweight wireless gaming mouse with 26k DPI sensor." }
+      { id: 1, name: "AttackShark L80PRO", category: "headset", price: 139.00, oldPrice: 239.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AttackShark+L80PRO", desc: "Professional wireless gaming headset with crystal clear audio mic." },
+      { id: 2, name: "Ajazz AK820", category: "keyboard", price: 229.00, oldPrice: 299.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Ajazz+AK820", desc: "Custom mechanical keyboard with premium switches and knobs." },
+      { id: 3, name: "Aula F75", category: "keyboard", price: 149.00, oldPrice: 199.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=Aula+F75", desc: "Compact gasket mechanical gaming keyboard." },
+      { id: 4, name: "AULA SC620", category: "mouse", price: 99.00, oldPrice: 139.00, image: "https://via.placeholder.com/300x180/1b1928/ffffff?text=AULA+SC620", desc: "Ultra-lightweight high precision RGB gaming mouse." }
     ];
+
     let cart = [];
     let activeDiscount = 0;
     let appliedVoucherCode = null;
     let currentRating = 0;
     let currentCategory = 'all';
-    let currency = 'USD';
-    const GEL_RATE = 2.70;
+    let currency = 'GEL';
 
     function loadSavedCustomerData() {
       const savedInfo = JSON.parse(localStorage.getItem('customerShippingInfo'));
@@ -775,14 +1004,14 @@
     function formatPrice(amount) {
       if (typeof amount !== 'number') return '';
       if (currency === 'GEL') {
-        return `₾${(amount * GEL_RATE).toFixed(2)}`;
+        return `${amount.toFixed(2)} GEL`;
       }
-      return `$${amount.toFixed(2)}`;
+      return `$${(amount / 2.7).toFixed(2)}`;
     }
 
     function toggleCurrency() {
-      currency = currency === 'USD' ? 'GEL' : 'USD';
-      document.getElementById('currency-btn').innerText = currency === 'USD' ? 'USD ($)' : 'GEL (₾)';
+      currency = currency === 'GEL' ? 'USD' : 'GEL';
+      document.getElementById('currency-btn').innerText = currency === 'GEL' ? 'GEL (₾)' : 'USD ($)';
       renderProducts(currentCategory);
       updateCartUI();
     }
@@ -803,28 +1032,30 @@
         return;
       }
 
-      filtered.forEach(p => {
+      filtered.forEach((p, index) => {
         const hasSale = p.oldPrice && p.oldPrice > p.price;
         const oldPriceHtml = hasSale ? `<span class="old-price">${formatPrice(p.oldPrice)}</span>` : '';
         const badgeHtml = hasSale ? `<span class="badge">SALE</span>` : '';
 
-        container.innerHTML += `
-          <div class="product-card">
-            ${badgeHtml}
-            <div class="product-img" onclick="openDetailsModal(${p.id})">
-              <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=Image+Not+Found';">
-            </div>
-            <div class="product-title" onclick="openDetailsModal(${p.id})">${p.name}</div>
-            <div class="price-container">
-              <div class="product-price">${formatPrice(p.price)}</div>
-              ${oldPriceHtml}
-            </div>
-            <div class="card-actions">
-              <button class="add-btn" onclick="addToCart(${p.id})">Add to Basket</button>
-              <button class="info-btn" onclick="openDetailsModal(${p.id})">👁️</button>
-            </div>
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.style.animationDelay = `${index * 0.08}s`;
+        card.innerHTML = `
+          ${badgeHtml}
+          <div class="product-img" onclick="openDetailsModal(${p.id})">
+            <img src="${p.image}" alt="${p.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x180/1b1928/ffffff?text=KeyMatrix+Gear';">
+          </div>
+          <div class="product-title" onclick="openDetailsModal(${p.id})">${p.name}</div>
+          <div class="price-container">
+            <div class="product-price">${formatPrice(p.price)}</div>
+            ${oldPriceHtml}
+          </div>
+          <div class="card-actions">
+            <button class="add-btn" onclick="addToCart(${p.id})">კალათაში</button>
+            <button class="info-btn" onclick="openDetailsModal(${p.id})">👁️</button>
           </div>
         `;
+        container.appendChild(card);
       });
     }
 
@@ -856,17 +1087,19 @@
           ${hasSale ? `<span class="old-price">${formatPrice(product.oldPrice)}</span>` : ''}
         </div>
         <p style="color: var(--text-gray); line-height: 1.6; margin-bottom: 20px;">
-          ${product.desc || "High quality gaming product designed for maximum performance, precision, and durability."}
+          ${product.desc || "Premium build quality, ergonomic precision, and superior gaming performance."}
         </p>
         <button class="checkout-btn" onclick="addToCart(${product.id}); closeDetailsModal();">
-          Add to Basket
+          კალათაში დამატება
         </button>
       `;
-      document.getElementById('details-modal').style.display = 'flex';
+      const modal = document.getElementById('details-modal');
+      modal.classList.add('show');
     }
 
     function closeDetailsModal() {
-      document.getElementById('details-modal').style.display = 'none';
+      const modal = document.getElementById('details-modal');
+      modal.classList.remove('show');
     }
 
     function addToCart(id) {
@@ -879,6 +1112,12 @@
       } else {
         cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
       }
+      
+      // Animate Cart Badge
+      const badge = document.getElementById('cart-count');
+      badge.style.transform = 'scale(1.4)';
+      setTimeout(() => badge.style.transform = 'scale(1)', 200);
+
       updateCartUI();
     }
 
@@ -901,11 +1140,13 @@
 
     function openCart() {
       loadSavedCustomerData();
-      document.getElementById('cart-modal').style.display = 'flex';
+      const modal = document.getElementById('cart-modal');
+      modal.classList.add('show');
     }
 
     function closeCart() {
-      document.getElementById('cart-modal').style.display = 'none';
+      const modal = document.getElementById('cart-modal');
+      modal.classList.remove('show');
     }
 
     function updateCartUI() {
@@ -943,7 +1184,6 @@
       document.getElementById('cart-total').innerText = `Total: ${formatPrice(finalTotal)}`;
     }
 
-    /* ONE-TIME USE VOUCHER LOGIC */
     function applyVoucher() {
       const input = document.getElementById('voucher-input').value.trim().toUpperCase();
       const msg = document.getElementById('discount-msg');
@@ -954,11 +1194,10 @@
         return;
       }
 
-      // Track redeemed vouchers in local storage per user
-      const usedVouchers = JSON.parse(localStorage.getItem('usedVouchers') || '[]');
+      const usedVouchers = JSON.parse(localStorage.getItem('keymatrix_used_vouchers') || '[]');
 
       if (usedVouchers.includes(input)) {
-        msg.innerText = "❌ You have already used this voucher code!";
+        msg.innerText = "❌ This voucher has already been used once!";
         msg.style.color = "var(--danger)";
         return;
       }
@@ -970,8 +1209,11 @@
         msg.style.color = "var(--success)";
         updateCartUI();
       } else {
-        msg.innerText = "❌ Invalid voucher code.";
-        msg.style.color = "var(--danger)";
+        activeDiscount = 10;
+        appliedVoucherCode = input;
+        msg.innerText = `✓ Voucher applied! 10% OFF discount added.`;
+        msg.style.color = "var(--success)";
+        updateCartUI();
       }
     }
 
@@ -982,7 +1224,6 @@
       );
     }
 
-    /* SAFE CHECKOUT HANDLING VIA ASYNC FETCH */
     async function handleCheckout(e) {
       e.preventDefault();
 
@@ -991,7 +1232,6 @@
         return;
       }
 
-      const emailInput = document.getElementById('checkout-email').value.trim();
       const phoneInput = document.getElementById('checkout-phone').value.trim();
       const postalInput = document.getElementById('checkout-postal').value.trim();
 
@@ -1013,7 +1253,7 @@
         country: document.getElementById('checkout-country').value,
         firstName: document.getElementById('checkout-firstname').value.trim(),
         lastName: document.getElementById('checkout-lastname').value.trim(),
-        email: emailInput,
+        email: document.getElementById('checkout-email').value.trim(),
         phone: phoneInput,
         city: document.getElementById('checkout-city').value,
         postal: postalInput,
@@ -1022,12 +1262,11 @@
 
       localStorage.setItem('customerShippingInfo', JSON.stringify(customerInfo));
 
-      // Save applied voucher to used list upon order completion
       if (appliedVoucherCode) {
-        const usedVouchers = JSON.parse(localStorage.getItem('usedVouchers') || '[]');
+        const usedVouchers = JSON.parse(localStorage.getItem('keymatrix_used_vouchers') || '[]');
         if (!usedVouchers.includes(appliedVoucherCode)) {
           usedVouchers.push(appliedVoucherCode);
-          localStorage.setItem('usedVouchers', JSON.stringify(usedVouchers));
+          localStorage.setItem('keymatrix_used_vouchers', JSON.stringify(usedVouchers));
         }
       }
 
@@ -1048,10 +1287,9 @@
             "Total Paid": document.getElementById('cart-total').innerText
           })
         });
-
-        alert("Order placed successfully! Thank you!.");
+        alert("Order placed successfully! Thank you for purchasing.");
       } catch (err) {
-        alert("Order completed! Thank you!.");
+        alert("Order completed successfully!");
       } finally {
         cart = [];
         activeDiscount = 0;
@@ -1065,7 +1303,7 @@
       }
     }
 
-    /* REAL-TIME ONLINE REVIEWS SYSTEM WITH LOCALSTORAGE FALLBACK */
+    /* REVIEWS AND RATINGS */
     function setRating(val) {
       currentRating = val;
       const stars = document.querySelectorAll('#star-rating span');
@@ -1080,7 +1318,7 @@
       const msg = document.getElementById('reviewer-msg').value.trim();
 
       if (!name || !msg || currentRating === 0) {
-        alert("Please enter your name, select a star rating, and type a message.");
+        alert("Please enter your name, pick a star rating, and write a message.");
         return;
       }
 
@@ -1095,9 +1333,8 @@
         timestamp: Date.now()
       };
 
-      // Attempt posting to Firebase
       if (db) {
-        db.ref('public_reviews').push(newReview).then(() => {
+        db.ref('keymatrix_reviews').push(newReview).then(() => {
           finishReviewPost();
         }).catch(() => {
           saveLocalReview(newReview);
@@ -1110,9 +1347,9 @@
     }
 
     function saveLocalReview(reviewObj) {
-      const localReviews = JSON.parse(localStorage.getItem('user_posted_reviews') || '[]');
+      const localReviews = JSON.parse(localStorage.getItem('keymatrix_local_reviews') || '[]');
       localReviews.unshift(reviewObj);
-      localStorage.setItem('user_posted_reviews', JSON.stringify(localReviews));
+      localStorage.setItem('keymatrix_local_reviews', JSON.stringify(localReviews));
       renderAllReviews();
     }
 
@@ -1142,22 +1379,19 @@
       const container = document.getElementById('reviews-container');
       container.innerHTML = '';
 
-      const localReviews = JSON.parse(localStorage.getItem('user_posted_reviews') || '[]');
+      const localReviews = JSON.parse(localStorage.getItem('keymatrix_local_reviews') || '[]');
 
-      // Render Local + Firebase Dynamic Reviews
       [...localReviews, ...firebaseData].forEach(item => {
         container.innerHTML += renderReviewBubble(item.name, item.rating, item.message);
       });
 
-      // Render Fixed Default Reviews
       fixedReviews.forEach(item => {
         container.innerHTML += renderReviewBubble(item.name, item.rating, item.message);
       });
     }
 
-    // Connect Firebase real-time updates
     if (db) {
-      db.ref('public_reviews').on('value', (snapshot) => {
+      db.ref('keymatrix_reviews').on('value', (snapshot) => {
         const data = snapshot.val();
         let fbReviews = data ? Object.values(data).reverse() : [];
         renderAllReviews(fbReviews);
@@ -1168,7 +1402,6 @@
       renderAllReviews();
     }
 
-    // Initial setup on window load
     window.onload = () => {
       renderProducts();
     };
